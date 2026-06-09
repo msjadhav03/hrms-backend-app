@@ -1,0 +1,28 @@
+export const employeeTableCreation = `
+CREATE TABLE IF NOT EXISTS employees (
+    id BIGSERIAL PRIMARY KEY,
+    employee_code VARCHAR(20) UNIQUE NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
+    official_mail VARCHAR(150) UNIQUE NOT NULL,
+    onboard_location VARCHAR(150)  NOT NULL,
+    job_title VARCHAR(100) NOT NULL,
+    salary NUMERIC(12,2) NOT NULL,
+    date_of_joining DATE NOT NULL,
+    department VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    address_line VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    zip_code VARCHAR(10) NOT NULL,
+    personal_email VARCHAR(150) UNIQUE NOT NULL,
+    contact_number VARCHAR(15) NOT NULL,
+    country_code VARCHAR(5) NOT NULL,
+    gender VARCHAR(20) NOT NULL,
+    married_status VARCHAR(20),
+    age INTEGER NOT NULL,
+    date_of_birth DATE NOT NULL,
+    pan_id VARCHAR(10) UNIQUE NOT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);`;

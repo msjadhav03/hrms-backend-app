@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SeedingService } from './seeding.service'; // Adjust path as needed
+import { SeedingService } from '../seeding.service'; // Adjust path as needed
 import { Pool } from 'pg';
 
 describe('SeedingService', () => {

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateEmployeeSchema } from '../../database/schema/employee.schema';
 import { UserEmployeeSchema } from '../../database/schema/user.schema';
-import { SuccessMessages } from '../../common/constants/messages';
+import { SeedingModule } from '../../common/constants/messages';
 
 describe('SeedingService', () => {
   let service: SeedingService;
@@ -52,7 +52,7 @@ describe('SeedingService', () => {
 
       expect(result).toEqual({
         status: HttpStatus.OK,
-        message: SuccessMessages.TABLE_CREATION_SUCCESS,
+        message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,,
       });
     });
 

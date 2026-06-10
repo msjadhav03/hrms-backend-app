@@ -1,4 +1,4 @@
-export const employeeTableCreation = `
+export const CreateEmployeeSchema = `
 CREATE TABLE IF NOT EXISTS employees (
     id BIGSERIAL PRIMARY KEY,
     employee_code VARCHAR(20) UNIQUE NOT NULL,

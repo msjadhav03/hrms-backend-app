@@ -3,6 +3,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,6 +18,14 @@ async function bootstrap() {
       ],
     }),
   });
+  const config = new DocumentBuilder()
+    .setTitle('HRMS API')
+    .setDescription('Detailed API documentation HRMS application')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
   const configService = app.get(ConfigService);
   const rawOrigins = configService.get<string>('ALLOWDED_ORIGINS');
   const allowedOrigins = rawOrigins

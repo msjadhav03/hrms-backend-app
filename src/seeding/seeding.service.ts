@@ -8,7 +8,7 @@ import {
 import { Pool } from 'pg';
 import { CreateEmployeeSchema } from '../database/schema/employee.schema';
 import { UserEmployeeSchema } from '../database/schema/user.schema';
-import { SuccessMessages } from '../common/constants/messages';
+import { SeedingModule } from '../common/constants/messages';
 
 @Injectable()
 export class SeedingService {
@@ -23,7 +23,7 @@ export class SeedingService {
       ]);
       return {
         status: HttpStatus.OK,
-        message: SuccessMessages.TABLE_CREATION_SUCCESS,
+        message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,
       };
     } catch (error) {
       this.logger.error(
@@ -41,7 +41,7 @@ export class SeedingService {
       ]);
       return {
         status: HttpStatus.OK,
-        message: SuccessMessages.TABLE_DROP_SUCCESS,
+        message: SeedingModule.SUCCESS_MESSAGES.TABLE_DROP_SUCCESS,
       };
     } catch (error) {
       this.logger.error(

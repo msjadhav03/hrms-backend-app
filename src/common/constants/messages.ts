@@ -1,7 +1,16 @@
 export const SuccessMessages = {
   TEST_SUCCESS_MESSAGE: 'Operation Succeded successfully ',
-  TABLE_CREATION_SUCCESS: 'Table has been created successfully',
-  TABLE_DROP_SUCCESS: 'Table has been dropped successfully',
+};
+
+export const SeedingModule = {
+  SUMMARY: {
+    TABLE_CREATION: 'This API is responsible for table creation',
+    TABLE_DROP: 'This API is responsible for table drop',
+  },
+  SUCCESS_MESSAGES: {
+    TABLE_CREATION_SUCCESS: 'Table creation success',
+    TABLE_DROP_SUCCESS: 'Database tables dropped successfully',
+  },
 };
 
 export const ErrorMessages = {

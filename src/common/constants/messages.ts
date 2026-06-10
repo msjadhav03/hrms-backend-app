@@ -1,6 +1,7 @@
 export const SuccessMessages = {
   TEST_SUCCESS_MESSAGE: 'Operation Succeded successfully ',
   TABLE_CREATION_SUCCESS: 'Table has been created successfully',
+  TABLE_DROP_SUCCESS: 'Table has been dropped successfully',
 };
 
 export const ErrorMessages = {

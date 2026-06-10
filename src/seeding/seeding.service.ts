@@ -32,4 +32,22 @@ export class SeedingService {
       throw InternalServerErrorException;
     }
   }
+
+  async dropDatabase() {
+    try {
+      const result = await Promise.all([
+        this.pool.query(`Drop table if exists employee cascade`),
+        this.pool.query(`Drop table if exists user cascade`),
+      ]);
+      return {
+        status: HttpStatus.OK,
+        message: SuccessMessages.TABLE_DROP_SUCCESS,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Seeding Service: Runtime error occured - Error while droping tables ${error.message}`,
+      );
+      throw InternalServerErrorException;
+    }
+  }
 }

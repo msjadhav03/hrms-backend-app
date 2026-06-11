@@ -1,7 +1,7 @@
 import { Controller, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SeedingService } from './seeding.service';
-import { SeedingModule, ErrorMessages } from 'src/common/constants/messages';
+import { SeedingModule, ErrorMessages } from '../common/constants/messages';
 
 @ApiTags(SeedingModule.TAG)
 @Controller('seeding')
@@ -45,7 +45,7 @@ export class SeedingController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: ErrorMessages.INTERNAL_SERVER_ERROR,
   })
-  @Post('drop')
+  @Post('seed-table')
   seedTable() {
     return this.seedingService.seedTable();
   }

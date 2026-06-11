@@ -7,10 +7,12 @@ export const SeedingModule = {
   SUMMARY: {
     TABLE_CREATION: 'This API is responsible for table creation',
     TABLE_DROP: 'This API is responsible for table drop',
+    TABLE_SEEDING: 'This API is responsible for table seeding',
   },
   SUCCESS_MESSAGES: {
     TABLE_CREATION_SUCCESS: 'Table creation success',
     TABLE_DROP_SUCCESS: 'Database tables dropped successfully',
+    TABLE_SEEDING_SUCCESS: 'Table seeding success',
   },
 };
 

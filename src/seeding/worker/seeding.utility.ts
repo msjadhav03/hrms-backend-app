@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import { Pool } from 'pg';
+import path from 'path';
 import { parentPort, workerData } from 'worker_threads';
 
 const GENDER = ['Male', 'Female', 'Other'];
@@ -613,13 +614,15 @@ const seedEmployees = async () => {
       console.log(
         `------- ${batchStart}, ${Math.min(batchStart + BATCH_SIZE, TOTAL_EMPLOYEES)}`,
       );
+      const filePathFirstName = path.resolve(__dirname, 'first.txt');
+      const filePathLastName = path.resolve(__dirname, 'last.txt');
       const firstNames = fs
-        .readFileSync('first.txt', 'utf8')
+        .readFileSync(filePathFirstName, 'utf8')
         .split('\n')
         .slice(batchStart, Math.min(batchStart + BATCH_SIZE, TOTAL_EMPLOYEES));
 
       const lastNames = fs
-        .readFileSync('last.txt', 'utf8')
+        .readFileSync(filePathLastName, 'utf8')
         .split('\n')
         .slice(batchStart, Math.min(batchStart + BATCH_SIZE, TOTAL_EMPLOYEES));
       for (

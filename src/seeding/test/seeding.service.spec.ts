@@ -12,7 +12,7 @@ import { SeedingModule } from '../../common/constants/messages';
 import { ConfigService } from '@nestjs/config';
 
 describe('SeedingService', () => {
-let service: SeedingService;
+  let service: SeedingService;
   let mockPool: Partial<Pool>;
   let mockConfigService: Partial<ConfigService>;
   let mockWorkerInstance: any;
@@ -51,12 +51,6 @@ let service: SeedingService;
 
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
-
-    mockWorkerInstance = {
-      on: jest.fn(),
-    };
-    (Worker as jest.Mock).mockImplementation(() => mockWorkerInstance);
-
   });
 
   afterEach(() => {
@@ -79,7 +73,7 @@ let service: SeedingService;
 
       expect(result).toEqual({
         status: HttpStatus.OK,
-        message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,,
+        message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,
       });
     });
 
@@ -90,26 +84,23 @@ let service: SeedingService;
         InternalServerErrorException,
       );
     });
-
   });
-
 
   describe('dropDatabase', () => {
-      it(`should execute drop table queries and return a success message`, async () => {
-        (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
+    it(`should execute drop table queries and return a success message`, async () => {
+      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-        const result = await service.dropDatabase();
+      const result = await service.dropDatabase();
 
-        expect(mockPool.query).toHaveBeenCalledTimes(2);
-        expect(mockPool.query).toHaveBeenNthCalledWith(
-          1,
-          `Drop table if exists employee cascade`,
-        );
-        expect(mockPool.query).toHaveBeenNthCalledWith(
-          2,
-          `Drop table if exists user cascade`,
-        );
-      });
+      expect(mockPool.query).toHaveBeenCalledTimes(2);
+      expect(mockPool.query).toHaveBeenNthCalledWith(
+        1,
+        `Drop table if exists employees cascade`,
+      );
+      expect(mockPool.query).toHaveBeenNthCalledWith(
+        2,
+        `Drop table if exists users cascade`,
+      );
+    });
   });
-    
 });

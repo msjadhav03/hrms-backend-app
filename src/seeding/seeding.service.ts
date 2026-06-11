@@ -17,14 +17,11 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class SeedingService {
   constructor(@Inject('PG_CONNECTION') private readonly pool: Pool) {}
-  private readonly configService: ConfigService;
   private readonly logger = new Logger(SeedingService.name);
   async createDatabase() {
     try {
-      const result = await Promise.all([
-        this.pool.query(CreateEmployeeSchema),
-        this.pool.query(UserEmployeeSchema),
-      ]);
+      await this.pool.query(CreateEmployeeSchema);
+      await this.pool.query(UserEmployeeSchema);
       return {
         status: HttpStatus.OK,
         message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,
@@ -39,10 +36,8 @@ export class SeedingService {
 
   async dropDatabase() {
     try {
-      const result = await Promise.all([
-        this.pool.query(`Drop table if exists employee cascade`),
-        this.pool.query(`Drop table if exists user cascade`),
-      ]);
+      await this.pool.query(`Drop table if exists employees cascade`);
+      await this.pool.query(`Drop table if exists users cascade`);
       return {
         status: HttpStatus.OK,
         message: SeedingModule.SUCCESS_MESSAGES.TABLE_DROP_SUCCESS,
@@ -56,6 +51,7 @@ export class SeedingService {
   }
 
   private executeWorkerTask(): Promise<void> {
+    const configService = new ConfigService();
     return new Promise((resolve, reject) => {
       const workerPath = path.resolve(
         __dirname,
@@ -103,8 +99,18 @@ export class SeedingService {
       this.logger.log(
         'Starting table creation on a background worker thread...',
       );
-      await this.executeWorkerTask();
-
+      const workerPromise = this.executeWorkerTask();
+      const timerPromise = new Promise((resolve) => setTimeout(resolve, 20000));
+      await Promise.race([workerPromise, timerPromise]);
+      workerPromise
+        .then(() => {
+          this.logger.log('Background Seeding Task completed successfully!');
+        })
+        .catch((bgError) => {
+          this.logger.error(
+            `Background Seeding Task failed later in background: ${bgError.message}`,
+          );
+        });
       return {
         status: HttpStatus.OK,
         message: SeedingModule.SUCCESS_MESSAGES.TABLE_SEEDING_SUCCESS,

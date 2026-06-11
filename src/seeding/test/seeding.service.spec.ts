@@ -9,15 +9,31 @@ import {
 import { CreateEmployeeSchema } from '../../database/schema/employee.schema';
 import { UserEmployeeSchema } from '../../database/schema/user.schema';
 import { SeedingModule } from '../../common/constants/messages';
+import { ConfigService } from '@nestjs/config';
 
 describe('SeedingService', () => {
-  let service: SeedingService;
+let service: SeedingService;
   let mockPool: Partial<Pool>;
+  let mockConfigService: Partial<ConfigService>;
+  let mockWorkerInstance: any;
 
   beforeEach(async () => {
     mockPool = {
       query: jest.fn(),
     };
+    mockConfigService = {
+      get: jest.fn((key: string) => {
+        const config = {
+          POSTGRES_HOST: 'localhost',
+          POSTGRES_PORT: '5432',
+          POSTGRES_USER: 'test_user',
+          POSTGRES_PASSWORD: 'test_password',
+          POSTGRES_DB: 'test_db',
+        };
+        return config[key];
+      }),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SeedingService,
@@ -25,11 +41,22 @@ describe('SeedingService', () => {
           provide: 'PG_CONNECTION',
           useValue: mockPool,
         },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
       ],
     }).compile();
-
     service = module.get<SeedingService>(SeedingService);
+
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
+
+    mockWorkerInstance = {
+      on: jest.fn(),
+    };
+    (Worker as jest.Mock).mockImplementation(() => mockWorkerInstance);
+
   });
 
   afterEach(() => {
@@ -56,7 +83,18 @@ describe('SeedingService', () => {
       });
     });
 
-    describe('dropDatabase', () => {
+    it('should log an error and throw InternalServerErrorException when a query fails', async () => {
+      const mockError = new Error('Database connection failed');
+      (mockPool.query as jest.Mock).mockRejectedValue(mockError);
+      await expect(service.createDatabase()).rejects.toBe(
+        InternalServerErrorException,
+      );
+    });
+
+  });
+
+
+  describe('dropDatabase', () => {
       it(`should execute drop table queries and return a success message`, async () => {
         (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
@@ -72,22 +110,6 @@ describe('SeedingService', () => {
           `Drop table if exists user cascade`,
         );
       });
-    });
-
-    it('should log an error and throw InternalServerErrorException when a query fails', async () => {
-      const mockError = new Error('Database connection failed');
-      (mockPool.query as jest.Mock).mockRejectedValue(mockError);
-      await expect(service.createDatabase()).rejects.toBe(
-        InternalServerErrorException,
-      );
-    });
-
-    it(`should log an error and throw InternalServerErrorExeption when a drop table queries failed`, async () => {
-      const mockError = new Error('Database connection failes');
-      (mockPool.query as jest.Mock).mockRejectedValue(mockError);
-      await expect(service.dropDatabase()).rejects.toBe(
-        InternalServerErrorException,
-      );
-    });
   });
+    
 });

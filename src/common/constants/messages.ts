@@ -3,6 +3,7 @@ export const SuccessMessages = {
 };
 
 export const SeedingModule = {
+  TAG: 'SeedingModule: APIs to Create, Delete and Seed Table',
   SUMMARY: {
     TABLE_CREATION: 'This API is responsible for table creation',
     TABLE_DROP: 'This API is responsible for table drop',

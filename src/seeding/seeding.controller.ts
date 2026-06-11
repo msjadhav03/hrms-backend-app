@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SeedingService } from './seeding.service';
 import { SeedingModule, ErrorMessages } from 'src/common/constants/messages';
 
-@ApiTags('Seeding API: Create, seed')
+@ApiTags(SeedingModule.TAG)
 @Controller('seeding')
 export class SeedingController {
   constructor(private readonly seedingService: SeedingService) {}

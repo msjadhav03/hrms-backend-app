@@ -23,6 +23,29 @@ export const SeedingModule = {
   },
 };
 
+export const DashboardModuleConstants = {
+  TAG: 'Dashboard Module: APIs to fetch Department trend, Yearly Trend, Min, max and avg trend',
+  SUMMARY: {
+    SUMMARY_DASHBOARD_DEPARTMENT:
+      'Responsible for fetching count per dashboard',
+    SUMMARY_DASHBOARD_YEARLY_TREND:
+      'Responsible for fetching recent yearly trend',
+    SUMMARY_DASHBOARD_VARIATION_TREND:
+      'Responsible for fetching Min, Max and Avg salary variation trend',
+  },
+  SUCCESS_MESSAGES: {
+    SUCCESS_DASHBOARD_DEPARTMENT: 'Fetched Department Data Successfully',
+    SUCCESS_DASHBOARD_MIN_MAX_AVG:
+      'Fetched MAX, MIN and AVG Salary Data Successfully',
+    SUCCESS_DASHBOARD_RECENT_SALARY: 'Fetched Recent Salary Data Successfully',
+  },
+  ERROR_MESSAGES: {
+    ERROR_DASHBOARD_DEPARTMENT: 'Failed to Fetch Department Data',
+    ERROR_DASHBOARD_MIN_MAX_AVG: 'Failed to Fetch MAX, MIN and AVG Salary Data',
+    ERROR_DASHBOARD_RECENT_SALARY: 'Failed to Fetch Recent Salary Data',
+  },
+};
+
 export const EmployeeModule = {
   TAG: 'EmployeeModule: APIs to Create, Delete, Upadate and Get Employee Resource',
   SUMMARY: {

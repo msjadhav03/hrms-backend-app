@@ -11,14 +11,12 @@ import { SeedingModule } from '../../common/constants/messages';
 import { CreateEmployeeSchema } from '../../database/schema/employee.schema';
 import { UserEmployeeSchema } from '../../database/schema/user.schema';
 
-// 1. Mock the native Node.js worker_threads module entirely
 jest.mock('worker_threads', () => {
   return {
     Worker: jest.fn(),
   };
 });
 
-// 2. Mock @nestjs/config to handle the inline "new ConfigService()" instantiation
 jest.mock('@nestjs/config', () => {
   return {
     ConfigService: jest.fn().mockImplementation(() => ({
@@ -58,20 +56,15 @@ describe('SeedingService', () => {
     }).compile();
 
     service = module.get<SeedingService>(SeedingService);
-
-    // Suppress console logger noise during testing
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
 
-    // Setup fresh Worker Mock Instance for event interception
     mockWorkerInstance = {
       on: jest.fn(),
     };
-    // Cast to unknown first to safely bypass structural comparison guards
     (Worker as unknown as jest.Mock).mockImplementation(
       () => mockWorkerInstance,
     );
-    // Use fake timers to handle the 20-second race conditions gracefully
     jest.useFakeTimers();
   });
 
@@ -84,11 +77,8 @@ describe('SeedingService', () => {
     expect(service).toBeDefined();
   });
 
-  // ==========================================
-  // TESTS FOR: createDatabase()
-  // ==========================================
   describe('createDatabase', () => {
-    it('should successfully run structural schemas sequentially', async () => {
+    it('should execute both queries and return a success message', async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
       const result = await service.createDatabase();
@@ -96,28 +86,24 @@ describe('SeedingService', () => {
       expect(mockPool.query).toHaveBeenCalledTimes(2);
       expect(mockPool.query).toHaveBeenNthCalledWith(1, CreateEmployeeSchema);
       expect(mockPool.query).toHaveBeenNthCalledWith(2, UserEmployeeSchema);
+
       expect(result).toEqual({
         status: HttpStatus.OK,
         message: SeedingModule.SUCCESS_MESSAGES.TABLE_CREATION_SUCCESS,
       });
     });
 
-    it('should throw InternalServerErrorException reference on structural query crashes', async () => {
-      (mockPool.query as jest.Mock).mockRejectedValue(
-        new Error('Query Timeout Error'),
-      );
-
+    it('should log an error and throw InternalServerErrorException when a query fails', async () => {
+      const mockError = new Error('Database connection failed');
+      (mockPool.query as jest.Mock).mockRejectedValue(mockError);
       await expect(service.createDatabase()).rejects.toBe(
         InternalServerErrorException,
       );
     });
   });
 
-  // ==========================================
-  // TESTS FOR: dropDatabase()
-  // ==========================================
   describe('dropDatabase', () => {
-    it('should run drop query strings sequentially', async () => {
+    it(`should execute drop table queries and return a success message`, async () => {
       (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
       const result = await service.dropDatabase();
@@ -148,23 +134,15 @@ describe('SeedingService', () => {
     });
   });
 
-  // ==========================================
-  // TESTS FOR: seedTable() [Promise.race logic]
-  // ==========================================
   describe('seedTable', () => {
     it('should send immediate success when 20s timeout window hits without worker failure', async () => {
-      // Arrange: Worker does nothing, keeping the promise pending indefinitely
       mockWorkerInstance.on.mockImplementation(() => mockWorkerInstance);
 
-      // Act: Start execution
       const seedPromise = service.seedTable();
-
-      // Fast-forward time past your 20-second threshold timer
       jest.advanceTimersByTime(20000);
 
       const result = await seedPromise;
 
-      // Assert
       expect(Worker).toHaveBeenCalledTimes(1);
       expect(result).toEqual({
         status: HttpStatus.OK,
@@ -173,7 +151,6 @@ describe('SeedingService', () => {
     });
 
     it('should throw InternalServerErrorException if worker explicitly fails within the 20s safety window', async () => {
-      // Arrange: Worker instantly throws an execution exception
       mockWorkerInstance.on.mockImplementation(
         (event: string, callback: Function) => {
           if (event === 'message') {
@@ -183,14 +160,12 @@ describe('SeedingService', () => {
         },
       );
 
-      // Act & Assert
       await expect(service.seedTable()).rejects.toThrow(
         InternalServerErrorException,
       );
     });
 
     it('should throw InternalServerErrorException if worker process crashes (exit code 1) within 20s window', async () => {
-      // Arrange: Force abnormal worker termination event loop
       mockWorkerInstance.on.mockImplementation(
         (event: string, callback: Function) => {
           if (event === 'exit') {
@@ -200,7 +175,6 @@ describe('SeedingService', () => {
         },
       );
 
-      // Act & Assert
       await expect(service.seedTable()).rejects.toThrow(
         InternalServerErrorException,
       );
@@ -209,7 +183,6 @@ describe('SeedingService', () => {
     it('should log background completion logs if worker resolves successfully AFTER the 20s response window', async () => {
       let savedMessageCallback: Function = () => {};
 
-      // Capture callback references so we can fire them whenever we choose manually
       mockWorkerInstance.on.mockImplementation(
         (event: string, callback: Function) => {
           if (event === 'message') savedMessageCallback = callback;
@@ -219,15 +192,12 @@ describe('SeedingService', () => {
 
       const loggerSpy = jest.spyOn(Logger.prototype, 'log');
 
-      // 1. Kick off process and pass the 20s mark to resolve the race condition
       const seedPromise = service.seedTable();
       jest.advanceTimersByTime(20000);
       await seedPromise;
 
-      // 2. Simulate worker resolving successfully long after HTTP response was already transmitted
       savedMessageCallback({ success: true });
 
-      // Allow microtask queue to clear up promises attached to `.then()`
       await Promise.resolve();
 
       expect(loggerSpy).toHaveBeenCalledWith(

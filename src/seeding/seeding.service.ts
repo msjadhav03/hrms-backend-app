@@ -5,7 +5,6 @@ import {
   Logger,
   HttpStatus,
 } from '@nestjs/common';
-import fs from 'fs';
 import { Worker } from 'worker_threads';
 import * as path from 'path';
 import { Pool } from 'pg';
@@ -28,7 +27,7 @@ export class SeedingService {
       };
     } catch (error) {
       this.logger.error(
-        `Seeding Service: Runtime error occured ${error.message}`,
+        `${SeedingModule.ERROR_MESSAGES.TABLE_CREATION_FAILED} ${error.message}`,
       );
       throw InternalServerErrorException;
     }
@@ -44,7 +43,7 @@ export class SeedingService {
       };
     } catch (error) {
       this.logger.error(
-        `Seeding Service: Runtime error occured - Error while droping tables ${error.message}`,
+        `${SeedingModule.ERROR_MESSAGES.TABLE_DELETION_FAILED} ${error.message}`,
       );
       throw InternalServerErrorException;
     }
@@ -57,9 +56,6 @@ export class SeedingService {
         __dirname,
         '../seeding/worker/seeding.utility.js',
       );
-
-      this.logger.log(`Here is worker path ------>`, workerPath);
-
       const host = configService.get<string>('POSTGRES_HOST');
       const port = parseInt(
         configService.get<string>('POSTGRES_PORT') || '5432',
@@ -104,11 +100,13 @@ export class SeedingService {
       await Promise.race([workerPromise, timerPromise]);
       workerPromise
         .then(() => {
-          this.logger.log('Background Seeding Task completed successfully!');
+          this.logger.log(
+            `${SeedingModule.SUCCESS_MESSAGES.BACKGROUND_TASK_SUCCESS}`,
+          );
         })
         .catch((bgError) => {
           this.logger.error(
-            `Background Seeding Task failed later in background: ${bgError.message}`,
+            `${SeedingModule.ERROR_MESSAGES.BACKGROUND_PROCESS_FAILED}: ${bgError.message}`,
           );
         });
       return {
@@ -117,7 +115,7 @@ export class SeedingService {
       };
     } catch (error) {
       this.logger.error(
-        `Seeding Service: Worker Runtime error occurred: ${error.message}`,
+        `${SeedingModule.ERROR_MESSAGES.TABLE_SEEDING_FAILED} ${error.message}`,
       );
       throw new InternalServerErrorException(error.message);
     }

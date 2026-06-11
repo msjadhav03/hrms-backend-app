@@ -23,6 +23,27 @@ export const SeedingModule = {
   },
 };
 
+export const EmployeeModule = {
+  TAG: 'EmployeeModule: APIs to Create, Delete, Upadate and Get Employee Resource',
+  SUMMARY: {
+    EMPLOYEE_CREATION: 'This API is responsible for Employee Resource creation',
+    EMPLOYEE_DELETED: 'This API is responsible for Employee Resource Deletion',
+    EMPLOYEE_FETCH: 'This API is responsible for Employee Resource Fetching',
+    EMPLOYEE_UPDATE: 'This API is responsible for Employee Resource Update',
+  },
+  SUCCESS_MESSAGES: {
+    EMPLOYEE_CREATION_SUCCESS: 'Table creation success',
+    EMPLOYEE_DELETE_SUCCESS: 'Database tables dropped successfully',
+    EMPLOYEE_FETCG_SUCCESS: 'Table seeding success',
+    EMPLOYEE_UPDATE_SUCCESS: 'Background task completed successfully',
+  },
+  ERROR_MESSAGES: {
+    EMPLOYEE_CREATION_FAILED: 'Table creation failed',
+    EMPLOYEE_DELETION_FAILED: 'Table Deletion failed',
+    EMPLOYEE_FETCH_FAILED: 'Background Process failed',
+    EMPLOYEE_UPDATE_FAILED: 'Table seeding failed',
+  },
+};
 export const ErrorMessages = {
   FORBIDDEN_ERROR: 'Forbidden / Unauthorized',
   INTERNAL_SERVER_ERROR: 'Internal Server Error',

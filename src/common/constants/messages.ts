@@ -46,6 +46,30 @@ export const DashboardModuleConstants = {
   },
 };
 
+export const AnalyticModuleConstants = {
+  TAG: 'Analytic Module: APIs to fetch Analytical Data',
+  SUMMARY: {
+    SUMMARY_ENTITY_COUNT:
+      '/analytics/count-of-entities : Responsible for fetching count of entities',
+    SUMMARY_TOP_MOST_PAID_JOBS:
+      '/analytics/top-most-paid-jobs : Responsible for fetching top most paid jobs',
+    SUMMARY_TOP_MOST_PAID_DEPARTMENT:
+      '/analytics/top-most-paid-department : Responsible for fetching top most paid department',
+  },
+  SUCCESS_MESSAGES: {
+    SUCCESS_ENTITY_COUNT: 'Organizations Entity Count Fetched Successfully',
+    SUCCESS_TOP_MOST_PAID_JOBS: 'Top Most Paid Jobs Data fetched Successfully',
+    SUCCESS_TOP_MOST_PAID_DEPARTMENT:
+      'Top Most Paid Department Data fetched Successfully',
+  },
+  ERROR_MESSAGES: {
+    ERROR_ENTITY_COUNT: 'Failed to Fetch Organizations Entity Count ',
+    ERROR_TOP_MOST_PAID_JOBS: 'Failed to fetch Top Most Paid Jobs Data',
+    ERROR_TOP_MOST_PAID_DEPARTMENT:
+      'Failed to fetch Top Most Paid Department Data',
+  },
+};
+
 export const EmployeeModule = {
   TAG: 'EmployeeModule: APIs to Create, Delete, Upadate and Get Employee Resource',
   SUMMARY: {

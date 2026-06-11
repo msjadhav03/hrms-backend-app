@@ -13,6 +13,13 @@ export const SeedingModule = {
     TABLE_CREATION_SUCCESS: 'Table creation success',
     TABLE_DROP_SUCCESS: 'Database tables dropped successfully',
     TABLE_SEEDING_SUCCESS: 'Table seeding success',
+    BACKGROUND_TASK_SUCCESS: 'Background task completed successfully',
+  },
+  ERROR_MESSAGES: {
+    TABLE_CREATION_FAILED: 'Table creation failed',
+    TABLE_DELETION_FAILED: 'Table Deletion failed',
+    BACKGROUND_PROCESS_FAILED: 'Background Process failed',
+    TABLE_SEEDING_FAILED: 'Table seeding failed',
   },
 };
 

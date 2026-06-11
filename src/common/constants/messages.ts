@@ -91,6 +91,16 @@ export const EmployeeModule = {
     EMPLOYEE_UPDATE_FAILED: 'Table seeding failed',
   },
 };
+
+export const AuthModuleConstants = {
+  TAG: 'Auth Module: Authorization and Authentication APIs',
+  SUCCESS_MESSAGES: {
+    LOGIN_SUCCESS: 'User has been logged Successfully',
+  },
+  ERROR_MESSAGES: {
+    LOGIN_FAILED: 'User Login Failed',
+  },
+};
 export const ErrorMessages = {
   FORBIDDEN_ERROR: 'Forbidden / Unauthorized',
   INTERNAL_SERVER_ERROR: 'Internal Server Error',

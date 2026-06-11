@@ -35,4 +35,18 @@ export class SeedingController {
   dropDatabase() {
     return this.seedingService.dropDatabase();
   }
+
+  @ApiOperation({ summary: SeedingModule.SUMMARY.TABLE_SEEDING })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: SeedingModule.SUCCESS_MESSAGES.TABLE_SEEDING_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @Post('drop')
+  seedTable() {
+    return this.seedingService.seedTable();
+  }
 }

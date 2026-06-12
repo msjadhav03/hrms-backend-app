@@ -94,7 +94,7 @@ describe('EmployeeController', () => {
       createNewEmployee: jest.fn(),
       updateEmployee: jest.fn(),
       findEmployeeById: jest.fn(),
-      deleteEmployeeById: jest.fn(),
+      deleteOne: jest.fn(),
       fetchEmployees: jest.fn(),
     };
 
@@ -216,34 +216,34 @@ describe('EmployeeController', () => {
     });
   });
 
-  // describe('deleteEmployeeById', () => {
-  //   const targetId = 'EMP-1234567890';
+  describe('deleteOne', () => {
+    const targetId = 'EMP-1234567890';
 
-  //   it('should call and pass payload to findOne and return success response with employeeDetails', async () => {
-  //     jest
-  //       .spyOn(service, 'deleteEmployeeById')
-  //       .mockResolvedValue(mockDeleteSuccessResponse);
+    it('should call and pass payload to findOne and return success response with employeeDetails', async () => {
+      jest
+        .spyOn(service, 'deleteOne')
+        .mockResolvedValue(mockDeleteSuccessResponse);
 
-  //     const result = await controller.deleteOne(targetId);
+      const result = await controller.deleteOne(targetId);
 
-  //     expect(service.deleteEmployeeById).toHaveBeenCalledTimes(1);
-  //     expect(service.deleteEmployeeById).toHaveBeenCalledWith(targetId);
-  //     expect(result).toEqual(mockDeleteSuccessResponse);
-  //   });
+      expect(service.deleteOne).toHaveBeenCalledTimes(1);
+      expect(service.deleteOne).toHaveBeenCalledWith(targetId);
+      expect(result).toEqual(mockDeleteSuccessResponse);
+    });
 
-  //   it('should log context and throw exceptions if the update execution fails', async () => {
-  //     const serviceError = new InternalServerErrorException(
-  //       ErrorMessages.INTERNAL_SERVER_ERROR,
-  //     );
-  //     jest.spyOn(service, 'deleteEmployeeById').mockRejectedValue(serviceError);
+    it('should log context and throw exceptions if the update execution fails', async () => {
+      const serviceError = new InternalServerErrorException(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+      jest.spyOn(service, 'deleteOne').mockRejectedValue(serviceError);
 
-  //     await expect(controller.findOne(targetId)).rejects.toThrow(
-  //       InternalServerErrorException,
-  //     );
+      await expect(controller.deleteOne(targetId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
 
-  //     await expect(controller.findOne(targetId)).rejects.toThrow(
-  //       ErrorMessages.INTERNAL_SERVER_ERROR,
-  //     );
-  //   });
-  // });
+      await expect(controller.deleteOne(targetId)).rejects.toThrow(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+    });
+  });
 });

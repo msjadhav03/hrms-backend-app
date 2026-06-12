@@ -319,7 +319,7 @@ describe('EmployeeService', () => {
       expect(queryArgs[1]).toEqual([targetId]);
     });
 
-    it('should return undefined data  if no employee matches the target id', async () => {
+    it('should return empty array data if no employee matches the target id', async () => {
       mockDbPool.query.mockResolvedValue({ rows: [] });
 
       const response = await service.findEmployeeById(targetId);
@@ -327,7 +327,7 @@ describe('EmployeeService', () => {
         status: HttpStatus.OK,
         message:
           EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
-        data: undefined,
+        data: [],
       });
     });
 
@@ -345,10 +345,45 @@ describe('EmployeeService', () => {
       await expect(service.findEmployeeById(targetId)).rejects.toThrow(
         dbErrorMessage,
       );
+    });
+  });
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error));
+  describe('deleteOne', () => {
+    const targetId = 'EMP-9876543210';
+    it('should successfully delete employee', async () => {
+      const response = await service.deleteOne(targetId);
 
-      consoleLogSpy.mockRestore();
+      expect(response).toEqual({
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
+      });
+
+      expect(mockDbPool.query).toHaveBeenCalledTimes(1);
+      const queryArgs = mockDbPool.query.mock.calls[0];
+      console.log(queryArgs);
+      expect(queryArgs[1][0]).toBe(targetId);
+    });
+
+    it('should throw an InternalServerErrorException if the database errors out', async () => {
+      const dbError = new Error('Deadlock detected or connection closed');
+      mockDbPool.query.mockRejectedValue(dbError);
+
+      const errorLoggerSpy = jest.spyOn(Logger.prototype, 'error');
+
+      await expect(service.deleteOne(targetId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+
+      await expect(service.deleteOne(targetId)).rejects.toThrow(
+        'Deadlock detected or connection closed',
+      );
+
+      expect(errorLoggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_DELETION_FAILED,
+        ),
+      );
     });
   });
 });

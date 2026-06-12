@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeModuleConstants } from '../common/constants/messages';
 import { NotificationService } from '../notification/notification.service';
+import { UpdateEmployeeDto } from './dto/update.employee.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -151,6 +152,74 @@ export class EmployeeService {
     } catch (error) {
       this.logger.error(
         `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_CREATION_FAILED} - ${error.message}`,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   *
+   * @param id - Employee code of the employee to be updated
+   * @param updateEmployeeDto - Object containg all the details that needs to be updated for the employee record in the database.
+   * @returns - Object containing the status and message regarding the employee updation in the database.
+   */
+  async updateEmployee(id: string, updateEmployeeDto: UpdateEmployeeDto) {
+    try {
+      let role = 'hr-manger';
+      if (updateEmployeeDto.department != 'Human Resources') {
+        role = 'user';
+      }
+      const query = `
+      UPDATE employees 
+      SET 
+        fullname = $1, official_mail = $2, onboard_location = $3, job_title = $4, 
+        salary = $5, date_of_joining = $6, department = $7, country = $8, 
+        address_line = $9, city = $10, state = $11, zip_code = $12, 
+        personal_email = $13, contact_number = $14, country_code = $15, 
+        gender = $16, married_status = $17, age = $18, date_of_birth = $19, 
+        pan_id = $20, updated_at = NOW()
+      WHERE employee_code = $21 AND is_deleted = false;
+    `;
+
+      const values = [
+        updateEmployeeDto.fullname,
+        updateEmployeeDto.official_mail,
+        updateEmployeeDto.onboard_location,
+        updateEmployeeDto.job_title,
+        updateEmployeeDto.salary,
+        updateEmployeeDto.date_of_joining,
+        updateEmployeeDto.department,
+        updateEmployeeDto.country,
+        updateEmployeeDto.address_line,
+        updateEmployeeDto.city,
+        updateEmployeeDto.state,
+        updateEmployeeDto.zip_code,
+        updateEmployeeDto.personal_email,
+        updateEmployeeDto.contact_number,
+        updateEmployeeDto.country_code,
+        updateEmployeeDto.gender,
+        updateEmployeeDto.married_status,
+        updateEmployeeDto.age,
+        updateEmployeeDto.date_of_birth,
+        updateEmployeeDto.pan_id,
+        id,
+      ];
+
+      const userQuery = `
+      UPDATE users SET role = $1, updated_at = NOW() WHERE employee_id = $2 AND is_deleted = false;
+    `;
+      const userValues = [role, id];
+
+      await this.db.query(query, values);
+      await this.db.query(userQuery, userValues);
+      return {
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_UPDATE_SUCCESS,
+      };
+    } catch (error) {
+      this.logger.error(
+        `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_UPDATE_FAILED} ERROR: ${error.message}`,
       );
       throw new InternalServerErrorException(error.message);
     }

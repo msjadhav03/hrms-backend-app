@@ -1,8 +1,12 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { EmployeeModuleConstants } from '../common/constants/messages';
+import {
+  EmployeeModuleConstants,
+  ErrorMessages,
+} from '../common/constants/messages';
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeService } from './employee.service';
+import { UpdateEmployeeDto } from './dto/update.employee.dto';
 
 @ApiTags(EmployeeModuleConstants.TAG)
 @Controller('employee')
@@ -23,5 +27,32 @@ export class EmployeeController {
   })
   async createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
     return await this.employeeService.createNewEmployee(createEmployeeDto);
+  }
+
+  /**
+   * @param id -  Employee ID to update employee data
+   * @param updateEmployeeDto - Object containing data to be updated
+   * @returns - Object Containing success response
+   */
+  @ApiOperation({ summary: EmployeeModuleConstants.SUMMARY.EMPLOYEE_UPDATE })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_UPDATE_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Put(':id')
+  async updateEmployee(
+    @Param('id') id: string,
+    @Body() updateEmployeeDto: UpdateEmployeeDto,
+  ) {
+    return this.employeeService.updateEmployee(id, updateEmployeeDto);
   }
 }

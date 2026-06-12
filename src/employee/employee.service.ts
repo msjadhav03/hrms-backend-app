@@ -11,6 +11,7 @@ import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeModuleConstants } from '../common/constants/messages';
 import { NotificationService } from '../notification/notification.service';
 import { UpdateEmployeeDto } from './dto/update.employee.dto';
+import { GetEmployeeDto } from './dto/get.employee.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -265,6 +266,54 @@ export class EmployeeService {
     } catch (error) {
       this.logger.error(
         `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_DELETION_FAILED} Error: ${error.message}`,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   * @param getEmployeeDto - Object containing the pagination details like page number and page size to fetch the employee list in a paginated manner.
+   * @returns - Object containing the status, message, list of employees, total count of employees, page number and page size regarding the employee fetching in the database.
+   */
+  async find(getEmployeeDto: GetEmployeeDto) {
+    try {
+      const { page, size, country, department, search } = getEmployeeDto;
+      const offset = (page - 1) * size;
+      let baseWhereClause = ' WHERE is_deleted = false';
+      const queryValues: any[] = [];
+      let index = 1;
+
+      if (country) {
+        baseWhereClause += ` AND country = $${index++}`;
+        queryValues.push(country);
+      }
+      if (department) {
+        baseWhereClause += ` AND department = $${index++}`;
+        queryValues.push(department);
+      }
+      if (search) {
+        baseWhereClause += ` AND fullname ILIKE $${index++}`;
+        queryValues.push(`%${search}%`);
+      }
+      const countQuery = `SELECT count(*)::int FROM employees${baseWhereClause};`;
+      const totalCountResult = await this.db.query(countQuery, queryValues);
+      const totalCount = totalCountResult?.rows[0]?.count || 0;
+      const dataQuery = `SELECT * FROM employees${baseWhereClause} LIMIT $${index++} OFFSET $${index++};`;
+      const finalValues = [...queryValues, size, offset];
+
+      const result = await this.db.query(dataQuery, finalValues);
+      return {
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+        data: result?.rows || [],
+        totalCount: totalCount,
+        page: page,
+        size: size,
+      };
+    } catch (error) {
+      this.logger.error(
+        `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_FETCH_FAILED} Error: ${error.message}`,
       );
       throw new InternalServerErrorException(error.message);
     }

@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -16,6 +17,7 @@ import {
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeService } from './employee.service';
 import { UpdateEmployeeDto } from './dto/update.employee.dto';
+import { GetEmployeeDto } from './dto/get.employee.dto';
 
 @ApiTags(EmployeeModuleConstants.TAG)
 @Controller('employee')
@@ -63,6 +65,29 @@ export class EmployeeController {
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ) {
     return this.employeeService.updateEmployee(id, updateEmployeeDto);
+  }
+
+  /**
+   * @param getEmployeeDto - Object to filter basis on country and/or department
+   * @returns Objest containing success response
+   */
+  @ApiOperation({ summary: EmployeeModuleConstants.SUMMARY.EMPLOYEE_FETCH })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Get()
+  async getEmployees(@Query() getEmployeeDto: GetEmployeeDto) {
+    return this.employeeService.find(getEmployeeDto);
   }
   /**
    *

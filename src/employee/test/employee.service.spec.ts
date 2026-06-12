@@ -9,6 +9,7 @@ import {
 import { EmployeeModuleConstants } from '../../common/constants/messages';
 import { CreateEmployeeDto } from '../dto/create.employee.dto';
 import bcrypt from 'bcrypt';
+import { UpdateEmployeeDto } from '../dto/update.employee.dto';
 
 describe('EmployeeService', () => {
   let service: EmployeeService;
@@ -201,6 +202,83 @@ describe('EmployeeService', () => {
       await expect(
         service.createNewEmployee(mockCreateEmployeeDto),
       ).rejects.toThrow(dbErrorMessage);
+    });
+  });
+
+  describe('UpdateEmploye', () => {
+    const targetId = 'EMP-9876543210';
+    const mockUpdateEmployeeDto: UpdateEmployeeDto = {
+      fullname: 'Manisha Jadhav',
+      official_mail: 'manishajadhav0026@gmail.com',
+      onboard_location: 'Pune',
+      job_title: 'Senior Software Engineer',
+      salary: 120000,
+      date_of_joining: '2026-07-01',
+      department: 'Engineering',
+      country: 'India',
+      address_line: 'Hinjawadi Phase 3',
+      city: 'Pune',
+      state: 'Maharashtra',
+      zip_code: '411057',
+      personal_email: 'manisha.personal@example.com',
+      contact_number: '9876543210',
+      country_code: '+91',
+      gender: 'Female',
+      married_status: 'Single',
+      age: 25,
+      date_of_birth: '2001-01-01',
+      pan_id: 'ABCDE1234F',
+    };
+    it('should successfully update employee', async () => {
+      const response = await service.updateEmployee(
+        targetId,
+        mockUpdateEmployeeDto,
+      );
+
+      expect(response).toEqual({
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_UPDATE_SUCCESS,
+      });
+
+      expect(mockDbPool.query).toHaveBeenCalledTimes(2);
+      const employeeQueryArgs = mockDbPool.query.mock.calls[0];
+      expect(employeeQueryArgs[1][20]).toBe(targetId);
+
+      const userQueryArgs = mockDbPool.query.mock.calls[1];
+      expect(userQueryArgs[1]).toEqual(['user', targetId]);
+    });
+
+    it('should map user role mapping to "hr-manger" if the department is Human Resources', async () => {
+      const hrUpdateDto = {
+        ...mockUpdateEmployeeDto,
+        department: 'Human Resources',
+      };
+      await service.updateEmployee(targetId, hrUpdateDto);
+
+      const userQueryArgs = mockDbPool.query.mock.calls[1];
+      expect(userQueryArgs[1]).toEqual(['hr-manger', targetId]);
+    });
+
+    it('should throw an InternalServerErrorException if the database errors out', async () => {
+      const dbError = new Error('Deadlock detected or connection closed');
+      mockDbPool.query.mockRejectedValue(dbError);
+
+      const errorLoggerSpy = jest.spyOn(Logger.prototype, 'error');
+
+      await expect(
+        service.updateEmployee(targetId, mockUpdateEmployeeDto),
+      ).rejects.toThrow(InternalServerErrorException);
+
+      await expect(
+        service.updateEmployee(targetId, mockUpdateEmployeeDto),
+      ).rejects.toThrow('Deadlock detected or connection closed');
+
+      expect(errorLoggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_UPDATE_FAILED,
+        ),
+      );
     });
   });
 });

@@ -81,8 +81,8 @@ export const EmployeeModuleConstants = {
   SUCCESS_MESSAGES: {
     EMPLOYEE_CREATION_SUCCESS: 'Emplpyee has been onboarded successfully',
     EMPLOYEE_DELETE_SUCCESS: 'Database tables dropped successfully',
-    EMPLOYEE_FETCG_SUCCESS: 'Table seeding success',
-    EMPLOYEE_UPDATE_SUCCESS: 'Background task completed successfully',
+    EMPLOYEE_FETCH_SUCCESS: 'Table seeding success',
+    EMPLOYEE_UPDATE_SUCCESS: 'Employee Updated successfully',
   },
   ERROR_MESSAGES: {
     EMPLOYEE_CREATION_FAILED: 'Table creation failed',

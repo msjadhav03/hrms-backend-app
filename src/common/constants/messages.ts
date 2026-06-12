@@ -79,7 +79,7 @@ export const EmployeeModuleConstants = {
     EMPLOYEE_UPDATE: 'This API is responsible for Employee Resource Update',
   },
   SUCCESS_MESSAGES: {
-    EMPLOYEE_CREATION_SUCCESS: 'Table creation success',
+    EMPLOYEE_CREATION_SUCCESS: 'Emplpyee has been onboarded successfully',
     EMPLOYEE_DELETE_SUCCESS: 'Database tables dropped successfully',
     EMPLOYEE_FETCG_SUCCESS: 'Table seeding success',
     EMPLOYEE_UPDATE_SUCCESS: 'Background task completed successfully',
@@ -89,6 +89,9 @@ export const EmployeeModuleConstants = {
     EMPLOYEE_DELETION_FAILED: 'Table Deletion failed',
     EMPLOYEE_FETCH_FAILED: 'Background Process failed',
     EMPLOYEE_UPDATE_FAILED: 'Table seeding failed',
+    FAILED_PASSWORD_HASHING: 'Failed while generating hashed password',
+    FAILED_GENERATING_RANDOM_PASSWORD:
+      'Failed while generating random password',
   },
 };
 

@@ -3,6 +3,12 @@ import { EmployeeModule } from '../employee.module';
 import { EmployeeController } from '../employee.controller';
 import { EmployeeService } from '../employee.service';
 
+jest.mock('../../notification/notification.service', () => ({
+  NotificationService: class {
+    sendEmail = jest.fn().mockResolvedValue(undefined);
+  },
+}));
+
 describe('EmployeeModule', () => {
   let moduleInstance: TestingModule;
   let mockPool: any;
@@ -13,6 +19,7 @@ describe('EmployeeModule', () => {
       query: jest.fn(),
       end: jest.fn(),
     };
+
     moduleInstance = await Test.createTestingModule({
       imports: [EmployeeModule],
     })

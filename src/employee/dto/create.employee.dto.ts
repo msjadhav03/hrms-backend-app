@@ -91,8 +91,8 @@ export class CreateEmployeeDto {
   state: string;
 
   @ApiProperty({
-    description: 'Date of birth of employee',
-    example: '03-01-2023',
+    description: 'Zip code of the employee residence',
+    example: '312133',
   })
   @IsString()
   @IsNotEmpty()

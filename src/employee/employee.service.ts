@@ -9,12 +9,14 @@ import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeModuleConstants } from '../common/constants/messages';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @Inject('PG_CONNECTION')
     private readonly db: Pool,
+    private readonly notificationService: NotificationService,
   ) {}
   private readonly logger = new Logger(EmployeeService.name);
 
@@ -25,7 +27,10 @@ export class EmployeeService {
     try {
       return Math.floor(1000000000 + Math.random() * 9000000000);
     } catch (error) {
-      throw InternalServerErrorException;
+      throw new InternalServerErrorException(
+        EmployeeModuleConstants.ERROR_MESSAGES
+          .FAILED_GENERATING_RANDOM_PASSWORD,
+      );
     }
   };
 
@@ -39,7 +44,9 @@ export class EmployeeService {
       const hashedPassword = await bcrypt.hash(password, 10);
       return hashedPassword;
     } catch (error) {
-      throw InternalServerErrorException;
+      throw new InternalServerErrorException(
+        EmployeeModuleConstants.ERROR_MESSAGES.FAILED_PASSWORD_HASHING,
+      );
     }
   }
 
@@ -63,6 +70,13 @@ export class EmployeeService {
    */
   async createNewEmployee(createEmployeeDto: CreateEmployeeDto) {
     try {
+      const tempPassword = this.generateRandomString();
+      const hashedPassword = await this.generatePassword(tempPassword);
+      const empId = `EMP-${this.randomNumber()}`;
+      let role = 'hr-manger';
+      if (createEmployeeDto.department != 'Human Resources') {
+        role = 'user';
+      }
       const query = `
       INSERT INTO employees (
         employee_code, fullname, official_mail, onboard_location, job_title, salary, 
@@ -75,7 +89,7 @@ export class EmployeeService {
     `;
 
       const values = [
-        `EMP-${this.randomNumber()}`,
+        empId,
         createEmployeeDto.fullname,
         createEmployeeDto.official_mail,
         createEmployeeDto.onboard_location,
@@ -98,18 +112,41 @@ export class EmployeeService {
         createEmployeeDto.pan_id,
       ];
 
-      const response = await this.db.query(query, values);
+      await this.db.query(query, values);
+
+      const queryUser = `
+        INSERT INTO users (
+          email,
+          password,
+          role,
+          employee_id,
+          is_deleted,
+          created_at,
+          updated_at
+        )
+        VALUES($1, $2, $3, $4, $5, NOW(), NOW())`;
+
+      const userValues = [
+        createEmployeeDto.official_mail,
+        hashedPassword,
+        role,
+        empId,
+        false,
+      ];
+
+      await this.db.query(queryUser, userValues);
+      await this.notificationService.sendEmail({
+        name: createEmployeeDto.fullname,
+        email: createEmployeeDto.official_mail,
+        password: tempPassword,
+      });
       this.logger.log(
         `${EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_CREATION_SUCCESS}`,
       );
-
       return {
         status: HttpStatus.OK,
         message:
           EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_CREATION_SUCCESS,
-        data: {
-          insertedCount: response.rowCount,
-        },
       };
     } catch (error) {
       this.logger.error(

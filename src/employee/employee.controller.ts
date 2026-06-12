@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   EmployeeModuleConstants,
@@ -54,5 +62,30 @@ export class EmployeeController {
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ) {
     return this.employeeService.updateEmployee(id, updateEmployeeDto);
+  }
+  /**
+   *
+   * @param id - Employee ID to fetch employee data
+   * @returns - Object containing specific emplpyee data
+   */
+  @ApiOperation({
+    summary: EmployeeModuleConstants.SUMMARY.EMPLOYEE_FETCH_BY_ID,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.employeeService.findEmployeeById(id);
   }
 }

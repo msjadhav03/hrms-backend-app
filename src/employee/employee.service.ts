@@ -224,4 +224,26 @@ export class EmployeeService {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  /**
+   *
+   * @param id - Employee code of the employee whose profile data needs to be fetched from the database.
+   * @returns - Object containing the status, message and employee details regarding the employee profile data fetching in the database.
+   */
+  async findEmployeeById(id: string) {
+    try {
+      const query = `SELECT e.*, u.role from employees e INNER JOIN users u ON e.employee_code = u.employee_id where e.employee_code = $1 AND e.is_deleted = false`;
+      const employeeData = await this.db.query(query, [id]);
+
+      return {
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+        data: employeeData?.rows[0],
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

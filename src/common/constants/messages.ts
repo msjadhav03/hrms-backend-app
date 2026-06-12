@@ -104,11 +104,15 @@ export const AuthModuleConstants = {
 
 export const NotificationModuleConstants = {
   TAG: 'Notification Module: APIs for Send Notifications',
+  SUMMARY: {
+    SEND_NOTIFICATION: 'Notification APIs to send notifications',
+    UPDATE_NOTIFICATION_TEMPLATE: 'Update notification mail template',
+  },
   SUCCESS_MESSAGES: {
-    EMAIL_SUCCESS: 'User Creation Mail Sent Successfully',
+    EMAIL_SUCCESS: 'E-Mail Sent Successfully',
   },
   ERROR_MESSAGES: {
-    EMAIL_FAILED: 'Failed to sent user creation mail',
+    EMAIL_FAILED: 'Failed to sent e-mail',
   },
 };
 

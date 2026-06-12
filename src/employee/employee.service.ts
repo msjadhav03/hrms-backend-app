@@ -239,10 +239,33 @@ export class EmployeeService {
         status: HttpStatus.OK,
         message:
           EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
-        data: employeeData?.rows[0],
+        data: employeeData?.rows[0] || [],
       };
     } catch (error) {
-      console.log(error);
+      this.logger.error(
+        `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_FETCH_FAILED} Error: ${error.message}`,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   * @param id - ID of employee to be deleted
+   * @returns - Object containing success response
+   */
+  async deleteOne(id: string) {
+    try {
+      const queryEmployee = `DELETE from employees where employee_code=$1`;
+      await this.db.query(queryEmployee, [id]);
+      return {
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
+      };
+    } catch (error) {
+      this.logger.error(
+        `${EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_DELETION_FAILED} Error: ${error.message}`,
+      );
       throw new InternalServerErrorException(error.message);
     }
   }

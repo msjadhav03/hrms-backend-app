@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -87,5 +88,31 @@ export class EmployeeController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.employeeService.findEmployeeById(id);
+  }
+
+  /**
+   *
+   * @param id - Employee ID to fetch employee data
+   * @returns - Object containing specific emplpyee data
+   */
+  @ApiOperation({
+    summary: EmployeeModuleConstants.SUMMARY.EMPLOYEE_DELETED,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string) {
+    return this.employeeService.deleteOne(id);
   }
 }

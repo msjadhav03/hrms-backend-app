@@ -8,6 +8,7 @@ import {
 } from '../../common/constants/messages';
 import { CreateEmployeeDto } from '../dto/create.employee.dto';
 import { UpdateEmployeeDto } from '../dto/update.employee.dto';
+import { GetEmployeeDto } from '../dto/get.employee.dto';
 
 describe('EmployeeController', () => {
   let controller: EmployeeController;
@@ -84,6 +85,23 @@ describe('EmployeeController', () => {
     },
   };
 
+  const mockGetEmployeeDto: GetEmployeeDto = {
+    page: 1,
+    size: 10,
+    country: 'India',
+    department: 'Engineering',
+    search: 'Manisha',
+  };
+
+  const mockPaginatedResponse = {
+    status: HttpStatus.OK,
+    message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+    data: [{ id: 1, fullname: 'Manisha Jadhav', department: 'Engineering' }],
+    totalCount: 1,
+    page: 1,
+    size: 10,
+  };
+
   const mockDeleteSuccessResponse = {
     status: HttpStatus.OK,
     message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
@@ -95,7 +113,7 @@ describe('EmployeeController', () => {
       updateEmployee: jest.fn(),
       findEmployeeById: jest.fn(),
       deleteOne: jest.fn(),
-      fetchEmployees: jest.fn(),
+      find: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -242,6 +260,36 @@ describe('EmployeeController', () => {
       );
 
       await expect(controller.deleteOne(targetId)).rejects.toThrow(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+    });
+  });
+
+  describe('getEmployees', () => {
+    it('should pass payload to find and returning the expected data', async () => {
+      jest.spyOn(service, 'find').mockResolvedValue(mockPaginatedResponse);
+      const result = await controller.getEmployees(mockGetEmployeeDto);
+      expect(service.find).toHaveBeenCalledTimes(1);
+      expect(service.find).toHaveBeenCalledWith(mockGetEmployeeDto);
+      expect(result).toEqual(mockPaginatedResponse);
+    });
+
+    it('should call with page and size', async () => {
+      const minimalDto: GetEmployeeDto = { page: 1, size: 5 };
+      jest.spyOn(service, 'find').mockResolvedValue(mockPaginatedResponse);
+      await controller.getEmployees(minimalDto);
+      expect(service.find).toHaveBeenCalledWith(minimalDto);
+    });
+
+    it('should throw InternalServerError in case of failure', async () => {
+      const serviceError = new InternalServerErrorException(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+      jest.spyOn(service, 'find').mockRejectedValue(serviceError);
+      await expect(controller.getEmployees(mockGetEmployeeDto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      await expect(controller.getEmployees(mockGetEmployeeDto)).rejects.toThrow(
         ErrorMessages.INTERNAL_SERVER_ERROR,
       );
     });

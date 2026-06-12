@@ -10,6 +10,7 @@ import { EmployeeModuleConstants } from '../../common/constants/messages';
 import { CreateEmployeeDto } from '../dto/create.employee.dto';
 import bcrypt from 'bcrypt';
 import { UpdateEmployeeDto } from '../dto/update.employee.dto';
+import { GetEmployeeDto } from '../dto/get.employee.dto';
 
 describe('EmployeeService', () => {
   let service: EmployeeService;
@@ -383,6 +384,92 @@ describe('EmployeeService', () => {
         expect.stringContaining(
           EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_DELETION_FAILED,
         ),
+      );
+    });
+  });
+
+  describe('find', () => {
+    it('should return paginated employee list without any filters successfully', async () => {
+      const dto: GetEmployeeDto = { page: 1, size: 10 };
+      const mockEmployees = [
+        { id: 1, fullname: 'John Doe' },
+        { id: 2, fullname: 'Jane Doe' },
+      ];
+      mockDbPool.query
+        .mockResolvedValueOnce({ rows: [{ count: 2 }] })
+        .mockResolvedValueOnce({ rows: mockEmployees });
+
+      const result = await service.find(dto);
+
+      expect(result).toEqual({
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+        data: mockEmployees,
+        totalCount: 2,
+        page: 1,
+        size: 10,
+      });
+
+      expect(mockDbPool.query).toHaveBeenCalledTimes(2);
+      const dataQueryArgs = mockDbPool.query.mock.calls[1];
+      expect(dataQueryArgs[1]).toEqual([10, 0]);
+    });
+
+    it('should correctly build queries when filtering by country, department, and search keywords', async () => {
+      const dto: GetEmployeeDto = {
+        page: 2,
+        size: 5,
+        country: 'India',
+        department: 'Engineering',
+        search: 'Manisha',
+      };
+
+      mockDbPool.query
+        .mockResolvedValueOnce({ rows: [{ count: 1 }] })
+        .mockResolvedValueOnce({
+          rows: [{ id: 9, fullname: 'Manisha Jadhav' }],
+        });
+
+      await service.find(dto);
+
+      const countQueryCall = mockDbPool.query.mock.calls[0];
+      expect(countQueryCall[0]).toContain(
+        'WHERE is_deleted = false AND country = $1 AND department = $2 AND fullname ILIKE $3',
+      );
+      expect(countQueryCall[1]).toEqual(['India', 'Engineering', '%Manisha%']);
+      const dataQueryCall = mockDbPool.query.mock.calls[1];
+      expect(dataQueryCall[1]).toEqual([
+        'India',
+        'Engineering',
+        '%Manisha%',
+        5,
+        5,
+      ]);
+    });
+
+    it('should return empty collection arrays if no entries match filter or/and search', async () => {
+      const dto: GetEmployeeDto = { page: 1, size: 10, country: 'Mars' };
+
+      mockDbPool.query
+        .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+        .mockResolvedValueOnce({ rows: null });
+
+      const result = await service.find(dto);
+      expect(result.data).toEqual([]);
+      expect(result.totalCount).toBe(0);
+    });
+
+    it('should bubble up an InternalServerErrorException if any running database command errors out', async () => {
+      const dto: GetEmployeeDto = { page: 1, size: 10 };
+      mockDbPool.query.mockRejectedValue(
+        new Error('Relation "employees" does not exist'),
+      );
+      await expect(service.find(dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      await expect(service.find(dto)).rejects.toThrow(
+        'Relation "employees" does not exist',
       );
     });
   });

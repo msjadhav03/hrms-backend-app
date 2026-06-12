@@ -3,7 +3,6 @@ import { DatabaseProviders } from '../database/database.service';
 import { EmployeeService } from './employee.service';
 import { EmployeeController } from './employee.controller';
 import { NotificationService } from '../notification/notification.service';
-import { MailerService } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [],

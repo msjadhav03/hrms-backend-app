@@ -74,30 +74,24 @@ describe('EmployeeService', () => {
     expect(service).toBeDefined();
   });
 
-  // src/employee/test/employee.service.spec.ts
-
   describe('randomNumber', () => {
-    it('should generate a 10-digit number format pool', () => {
+    it('should generate a 10-digit number', () => {
       const num = service.randomNumber();
       expect(num).toBeGreaterThanOrEqual(1000000000);
       expect(num).toBeLessThanOrEqual(9999999999);
     });
 
-    it('should throw an instantiated InternalServerErrorException if math generation fails', () => {
-      // 1. Force Math.random to fail out intentionally
+    it('should throw an InternalServerErrorException if math generation fails', () => {
       jest.spyOn(Math, 'random').mockImplementation(() => {
         throw new Error('Random generation crash');
       });
 
-      // 2. Use an explicit try/catch framework for accurate object validation
       try {
         service.randomNumber();
-        // If it doesn't throw, explicitly fail the test
         fail(
           'Expected randomNumber() to throw an exception, but it succeeded.',
         );
       } catch (error) {
-        // 3. Inspect the thrown exception properties precisely
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toBe(
           EmployeeModuleConstants.ERROR_MESSAGES
@@ -141,10 +135,10 @@ describe('EmployeeService', () => {
   });
 
   describe('createNewEmployee', () => {
-    it('should save employee and user entries, then dispatch a credentials email', async () => {
+    it('should save employee and user entries, then send a credentials email', async () => {
       const fixedRandomStr = 'MANISHA026';
       const fixedRandomNum = 8888888888;
-      const hashedPassMock = 'enc_hashed_pass_value';
+      const hashedPassMock = 'hashed_pass_value';
 
       jest
         .spyOn(service, 'generateRandomString')
@@ -178,7 +172,7 @@ describe('EmployeeService', () => {
       });
     });
 
-    it('should apply an "hr-manger" role instead of "user" if assigned to the Human Resources department', async () => {
+    it('should apply an "hr-manger" role', async () => {
       const hrEmployeeDto = {
         ...mockCreateEmployeeDto,
         department: 'Human Resources',
@@ -196,7 +190,7 @@ describe('EmployeeService', () => {
       expect(userQueryArgs[1][2]).toBe('hr-manger');
     });
 
-    it('should catch query breaks and bubble up an InternalServerErrorException wrapper', async () => {
+    it('should catch query failure and throw InternalServerErrorException wrapper', async () => {
       const dbErrorMessage = 'Connection pool timeout';
       mockDbPool.query.mockRejectedValue(new Error(dbErrorMessage));
 

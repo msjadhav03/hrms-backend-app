@@ -51,10 +51,51 @@ describe('EmployeeController', () => {
     message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_UPDATE_SUCCESS,
   };
 
+  const mockGetByIdSuccessReponse = {
+    status: HttpStatus.OK,
+    message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+    data: {
+      id: '10006',
+      employee_code: 'EMP-8939000943',
+      fullname: 'Manisha Jadhav',
+      official_mail: 'manishajadhav0026@gmail.com',
+      onboard_location: 'Pune',
+      job_title: 'Senior Software Engineer',
+      salary: '150000.00',
+      date_of_joining: '2000-02-01T18:30:00.000Z',
+      department: 'Human Resources',
+      country: 'India',
+      address_line: 'Kuber Park 1, Pune',
+      city: 'Pune',
+      state: 'Maharashtra',
+      zip_code: '312421',
+      personal_email: 'manishajadhav2323@gmail.com',
+      contact_number: '2232278444',
+      country_code: '91',
+      gender: 'Female',
+      married_status: 'Single',
+      age: 28,
+      date_of_birth: '1998-02-28T18:30:00.000Z',
+      pan_id: 'BQDP2342S',
+      is_deleted: false,
+      created_at: '2026-06-12T00:14:40.537Z',
+      updated_at: '2026-06-12T03:30:51.468Z',
+      role: 'hr-manger',
+    },
+  };
+
+  const mockDeleteSuccessResponse = {
+    status: HttpStatus.OK,
+    message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
+  };
+
   beforeEach(async () => {
     const mockEmployeeService = {
       createNewEmployee: jest.fn(),
       updateEmployee: jest.fn(),
+      findEmployeeById: jest.fn(),
+      deleteEmployeeById: jest.fn(),
+      fetchEmployees: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -143,4 +184,66 @@ describe('EmployeeController', () => {
       ).rejects.toThrow(ErrorMessages.INTERNAL_SERVER_ERROR);
     });
   });
+
+  describe('findOne', () => {
+    const targetId = 'EMP-1234567890';
+
+    it('should call and pass payload to findOne and return success response with employeeDetails', async () => {
+      jest
+        .spyOn(service, 'findEmployeeById')
+        .mockResolvedValue(mockGetByIdSuccessReponse);
+
+      const result = await controller.findOne(targetId);
+
+      expect(service.findEmployeeById).toHaveBeenCalledTimes(1);
+      expect(service.findEmployeeById).toHaveBeenCalledWith(targetId);
+      expect(result).toEqual(mockGetByIdSuccessReponse);
+    });
+
+    it('should log context and throw exceptions if the update execution fails', async () => {
+      const serviceError = new InternalServerErrorException(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+      jest.spyOn(service, 'findEmployeeById').mockRejectedValue(serviceError);
+
+      await expect(controller.findOne(targetId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+
+      await expect(controller.findOne(targetId)).rejects.toThrow(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+    });
+  });
+
+  // describe('deleteEmployeeById', () => {
+  //   const targetId = 'EMP-1234567890';
+
+  //   it('should call and pass payload to findOne and return success response with employeeDetails', async () => {
+  //     jest
+  //       .spyOn(service, 'deleteEmployeeById')
+  //       .mockResolvedValue(mockDeleteSuccessResponse);
+
+  //     const result = await controller.deleteOne(targetId);
+
+  //     expect(service.deleteEmployeeById).toHaveBeenCalledTimes(1);
+  //     expect(service.deleteEmployeeById).toHaveBeenCalledWith(targetId);
+  //     expect(result).toEqual(mockDeleteSuccessResponse);
+  //   });
+
+  //   it('should log context and throw exceptions if the update execution fails', async () => {
+  //     const serviceError = new InternalServerErrorException(
+  //       ErrorMessages.INTERNAL_SERVER_ERROR,
+  //     );
+  //     jest.spyOn(service, 'deleteEmployeeById').mockRejectedValue(serviceError);
+
+  //     await expect(controller.findOne(targetId)).rejects.toThrow(
+  //       InternalServerErrorException,
+  //     );
+
+  //     await expect(controller.findOne(targetId)).rejects.toThrow(
+  //       ErrorMessages.INTERNAL_SERVER_ERROR,
+  //     );
+  //   });
+  // });
 });

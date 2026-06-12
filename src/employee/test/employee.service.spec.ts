@@ -281,4 +281,74 @@ describe('EmployeeService', () => {
       );
     });
   });
+
+  describe('findEmployeeById', () => {
+    const targetId = 'EMP-9876543210';
+    const mockJoinedEmployeeRow = {
+      employee_code: targetId,
+      fullname: 'Manisha Jadhav',
+      official_mail: 'manishajadhav0026@gmail.com',
+      department: 'Engineering',
+      job_title: 'Software Engineer',
+      salary: 95000,
+      is_deleted: false,
+      role: 'user',
+    };
+
+    const mockGetByIdSuccessResponse = {
+      status: HttpStatus.OK,
+      message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+      data: mockJoinedEmployeeRow,
+    };
+
+    it('should successfully execute the inner join query and return a single employee object containing the matched user role', async () => {
+      mockDbPool.query.mockResolvedValue({ rows: [mockJoinedEmployeeRow] });
+
+      const response = await service.findEmployeeById(targetId);
+
+      expect(response).toEqual(mockGetByIdSuccessResponse);
+      expect(mockDbPool.query).toHaveBeenCalledTimes(1);
+
+      const queryArgs = mockDbPool.query.mock.calls[0];
+      expect(queryArgs[0]).toContain(
+        'SELECT e.*, u.role from employees e INNER JOIN users u',
+      );
+      expect(queryArgs[0]).toContain(
+        'where e.employee_code = $1 AND e.is_deleted = false',
+      );
+      expect(queryArgs[1]).toEqual([targetId]);
+    });
+
+    it('should return undefined data  if no employee matches the target id', async () => {
+      mockDbPool.query.mockResolvedValue({ rows: [] });
+
+      const response = await service.findEmployeeById(targetId);
+      expect(response).toEqual({
+        status: HttpStatus.OK,
+        message:
+          EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+        data: undefined,
+      });
+    });
+
+    it('should log execution errors to console and throw InternalServerErrorException', async () => {
+      const dbErrorMessage = 'Query read timeout on primary replica';
+      mockDbPool.query.mockRejectedValue(new Error(dbErrorMessage));
+
+      const consoleLogSpy = jest
+        .spyOn(console, 'log')
+        .mockImplementation(() => {});
+      await expect(service.findEmployeeById(targetId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+
+      await expect(service.findEmployeeById(targetId)).rejects.toThrow(
+        dbErrorMessage,
+      );
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error));
+
+      consoleLogSpy.mockRestore();
+    });
+  });
 });

@@ -76,12 +76,14 @@ export const EmployeeModuleConstants = {
     EMPLOYEE_CREATION: 'This API is responsible for Employee Resource creation',
     EMPLOYEE_DELETED: 'This API is responsible for Employee Resource Deletion',
     EMPLOYEE_FETCH: 'This API is responsible for Employee Resource Fetching',
+    EMPLOYEE_FETCH_BY_ID:
+      'This API is responsible for Employee Resource Fetching by ID',
     EMPLOYEE_UPDATE: 'This API is responsible for Employee Resource Update',
   },
   SUCCESS_MESSAGES: {
     EMPLOYEE_CREATION_SUCCESS: 'Emplpyee has been onboarded successfully',
     EMPLOYEE_DELETE_SUCCESS: 'Database tables dropped successfully',
-    EMPLOYEE_FETCH_SUCCESS: 'Table seeding success',
+    EMPLOYEE_FETCH_SUCCESS: 'Employee data has been successfully fetched',
     EMPLOYEE_UPDATE_SUCCESS: 'Employee Updated successfully',
   },
   ERROR_MESSAGES: {

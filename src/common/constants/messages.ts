@@ -70,7 +70,7 @@ export const AnalyticModuleConstants = {
   },
 };
 
-export const EmployeeModule = {
+export const EmployeeModuleConstants = {
   TAG: 'EmployeeModule: APIs to Create, Delete, Upadate and Get Employee Resource',
   SUMMARY: {
     EMPLOYEE_CREATION: 'This API is responsible for Employee Resource creation',
@@ -101,6 +101,17 @@ export const AuthModuleConstants = {
     LOGIN_FAILED: 'User Login Failed',
   },
 };
+
+export const NotificationModuleConstants = {
+  TAG: 'Notification Module: APIs for Send Notifications',
+  SUCCESS_MESSAGES: {
+    EMAIL_SUCCESS: 'User Creation Mail Sent Successfully',
+  },
+  ERROR_MESSAGES: {
+    EMAIL_FAILED: 'Failed to sent user creation mail',
+  },
+};
+
 export const ErrorMessages = {
   FORBIDDEN_ERROR: 'Forbidden / Unauthorized',
   INTERNAL_SERVER_ERROR: 'Internal Server Error',

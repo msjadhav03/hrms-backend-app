@@ -44,4 +44,54 @@ export class DashboardController {
   async findSalaryAvgMinMax(@Query() filter: FilterOptionDto) {
     return this.dashboardService.getSalaryTrend(filter);
   }
+
+  /**
+   * @param filter - Object Containing country and/or department values
+   * @returns - Object containing department wise count
+   */
+  @ApiOperation({
+    summary: DashboardModuleConstants.SUMMARY.SUMMARY_DASHBOARD_DEPARTMENT,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      DashboardModuleConstants.SUCCESS_MESSAGES.SUCCESS_DASHBOARD_DEPARTMENT,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Get('/department-wise-trend')
+  async findDepartmentWiseTrend(@Query() filter: FilterOptionDto) {
+    return this.dashboardService.departmentWiseTrend(filter);
+  }
+
+  /**
+   * @param filter - Object Containing country and/or department values
+   * @returns - Object containing recent years salary trend
+   */
+  @ApiOperation({
+    summary: DashboardModuleConstants.SUMMARY.SUMMARY_DASHBOARD_YEARLY_TREND,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      DashboardModuleConstants.SUCCESS_MESSAGES.SUCCESS_DASHBOARD_RECENT_SALARY,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Get('/recent-year-salary-trend')
+  async findLatestYearSalaryTrend(@Query() filter: FilterOptionDto) {
+    return this.dashboardService.getSalaryTrendRecentYears(filter);
+  }
 }

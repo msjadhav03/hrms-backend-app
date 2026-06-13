@@ -102,6 +102,28 @@ export class EmployeeController {
   async getEmployees(@Query() getEmployeeDto: GetEmployeeDto) {
     return this.employeeService.find(getEmployeeDto);
   }
+
+  /**
+   * @returns - Object containing country and department filter values
+   */
+  @ApiOperation({ summary: EmployeeModuleConstants.SUMMARY.FILTER_DATA })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_FETCH_SUCCESS,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: ErrorMessages.INTERNAL_SERVER_ERROR,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: ErrorMessages.FORBIDDEN_ERROR,
+  })
+  @Get('/filters')
+  async findCountryTitles() {
+    return this.employeeService.findFilterList();
+  }
   /**
    *
    * @param id - Employee ID to fetch employee data

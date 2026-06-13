@@ -317,4 +317,32 @@ export class EmployeeService {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  /**
+   * @returns - Object containing the list of distinct countries and departments available in the employee records in the database to be used as filter options while fetching the salary trend, employee count trend etc.
+   */
+  async findFilterList() {
+    try {
+      const response = await this.db.query(
+        `SELECT DISTINCT country from employees ORDER BY country ASC`,
+      );
+      console.log(response);
+      const departmentList = await this.db.query(
+        `SELECT DISTINCT department from employees ORDER BY department ASC`,
+      );
+      return {
+        status: HttpStatus.OK,
+        message: EmployeeModuleConstants.SUCCESS_MESSAGES.FILTER_SUCCESS,
+        data: {
+          country: response?.rows || [],
+          department: departmentList?.rows || [],
+        },
+      };
+    } catch (error) {
+      this.logger.error(
+        `${EmployeeModuleConstants.ERROR_MESSAGES.FAILED_FILTER} - Error: ${error.message}`,
+      );
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

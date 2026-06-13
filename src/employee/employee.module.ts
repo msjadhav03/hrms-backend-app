@@ -4,9 +4,10 @@ import { EmployeeService } from './employee.service';
 import { EmployeeController } from './employee.controller';
 import { NotificationService } from '../notification/notification.service';
 import { AuthModule } from '../auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, JwtModule],
   controllers: [EmployeeController],
   providers: [...DatabaseProviders, EmployeeService, NotificationService],
 })

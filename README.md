@@ -23,6 +23,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Swagger API DOCS
+
+![API DOCS](assets/swagger1.png)
+![API DOCS](assets/swagger2.png)
+![API DOCS](assets/swagger3.png)
+
 ## Run tests
 
 ```bash

@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from '../auth.controller';
-import { AuthService } from '../auth.service';
 import {
   HttpStatus,
   InternalServerErrorException,
   ForbiddenException,
 } from '@nestjs/common';
+import { AuthController } from '../auth.controller';
+import { AuthService } from '../auth.service';
 import { AuthModuleConstants } from '../../common/constants/messages';
 import { LoginDto } from '../dto/login.dto';
 
@@ -35,7 +35,6 @@ describe('Auth Controller', () => {
     const mockAuthService = {
       validateCredentials: jest.fn(),
     };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {

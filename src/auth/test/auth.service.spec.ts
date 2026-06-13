@@ -7,7 +7,7 @@ import { AuthModuleConstants } from '../../common/constants/messages';
 
 jest.mock('bcrypt');
 
-describe('AuthService', () => {
+describe('Auth Sevice', () => {
   let authService: AuthService;
 
   const mockPgConnection = {
@@ -40,7 +40,7 @@ describe('AuthService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it('should service be defined', () => {
     expect(authService).toBeDefined();
   });
 

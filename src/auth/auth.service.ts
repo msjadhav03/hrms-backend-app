@@ -41,6 +41,8 @@ export class AuthService {
         const payload = {
           sub: userData.rows[0].id,
           username: userData.rows[0].email,
+          role: userData.rows[0].role,
+          employee_id: userData.rows[0].employee_id,
         };
         return {
           statusCode: 200,

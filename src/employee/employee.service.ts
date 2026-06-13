@@ -16,8 +16,7 @@ import { GetEmployeeDto } from './dto/get.employee.dto';
 @Injectable()
 export class EmployeeService {
   constructor(
-    @Inject('PG_CONNECTION')
-    private readonly db: Pool,
+    @Inject('PG_CONNECTION') private readonly db: Pool,
     private readonly notificationService: NotificationService,
   ) {}
   private readonly logger = new Logger(EmployeeService.name);

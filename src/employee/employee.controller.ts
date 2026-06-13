@@ -8,8 +8,14 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   EmployeeModuleConstants,
   ErrorMessages,
@@ -18,8 +24,11 @@ import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeService } from './employee.service';
 import { UpdateEmployeeDto } from './dto/update.employee.dto';
 import { GetEmployeeDto } from './dto/get.employee.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags(EmployeeModuleConstants.TAG)
+@ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard)
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}

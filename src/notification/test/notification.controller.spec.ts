@@ -3,10 +3,17 @@ import { NotificationController } from '../notification.controller';
 import { NotificationService } from '../notification.service';
 import { HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { NotificationModuleConstants } from '../../common/constants/messages';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 describe('NotificationController', () => {
   let notificationService: NotificationService;
   let notificationController: NotificationController;
+  let jwtService: any;
+  let configService: any;
+  const mockConfigValues: Record<string, any> = {
+    JWT_SECRET: 'fsdfnsfdn',
+  };
 
   const mockEmailPayload = {
     email: 'recipient@example.com',
@@ -24,6 +31,13 @@ describe('NotificationController', () => {
     const mockNotificationService = {
       sendEmail: jest.fn(),
     };
+    jwtService = {
+      signAsync: jest.fn().mockResolvedValue('sdfsdfsdf'),
+      logger: jest.fn(),
+    };
+    configService = {
+      get: jest.fn().mockResolvedValue(mockConfigValues),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NotificationController],
@@ -31,6 +45,14 @@ describe('NotificationController', () => {
         {
           provide: NotificationService,
           useValue: mockNotificationService,
+        },
+        {
+          provide: JwtService,
+          useValue: jwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: configService,
         },
       ],
     }).compile();

@@ -25,10 +25,12 @@ import { EmployeeService } from './employee.service';
 import { UpdateEmployeeDto } from './dto/update.employee.dto';
 import { GetEmployeeDto } from './dto/get.employee.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @ApiTags(EmployeeModuleConstants.TAG)
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
@@ -45,6 +47,7 @@ export class EmployeeController {
     description:
       EmployeeModuleConstants.ERROR_MESSAGES.EMPLOYEE_CREATION_FAILED,
   })
+  @Roles('hr-manger', 'hr-manager')
   async createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
     return await this.employeeService.createNewEmployee(createEmployeeDto);
   }
@@ -69,6 +72,7 @@ export class EmployeeController {
     description: ErrorMessages.FORBIDDEN_ERROR,
   })
   @Put(':id')
+  @Roles('hr-manger', 'hr-manager')
   async updateEmployee(
     @Param('id') id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
@@ -145,6 +149,7 @@ export class EmployeeController {
     status: HttpStatus.FORBIDDEN,
     description: ErrorMessages.FORBIDDEN_ERROR,
   })
+  @Roles('hr-manger', 'hr-manager')
   @Delete(':id')
   async deleteOne(@Param('id') id: string) {
     return this.employeeService.deleteOne(id);

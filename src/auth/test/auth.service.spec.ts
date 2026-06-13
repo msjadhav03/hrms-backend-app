@@ -77,6 +77,8 @@ describe('Auth Sevice', () => {
       expect(mockJwtService.signAsync).toHaveBeenCalledWith({
         sub: mockUserData.id,
         username: mockUserData.email,
+        role: mockUserData.role,
+        employee_id: mockUserData.employee_id,
       });
       expect(result).toEqual({
         statusCode: 200,

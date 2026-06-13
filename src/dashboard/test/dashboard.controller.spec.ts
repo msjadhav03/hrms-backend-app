@@ -4,7 +4,7 @@ import { DashboardService } from '../dashboard.service';
 import { FilterOptionDto } from '../dto/filter.dto';
 import { AuthGuard } from '../../auth/auth.guard';
 import { RolesGuard } from '../../auth/roles.guard';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { DashboardModuleConstants } from '../../common/constants/messages';
 
 describe('DashboardController', () => {
@@ -13,6 +13,8 @@ describe('DashboardController', () => {
 
   const mockDashboardService = {
     getSalaryTrend: jest.fn(),
+    departmentWiseTrend: jest.fn(),
+    getSalaryTrendRecentYears: jest.fn(),
   };
 
   const mockAuthGuard = { canActivate: jest.fn(() => true) };
@@ -80,6 +82,73 @@ describe('DashboardController', () => {
       service.getSalaryTrend.mockResolvedValueOnce(mockResponse);
       const result = await controller.findSalaryAvgMinMax(mockFilter);
       expect(service.getSalaryTrend).toHaveBeenCalledWith(mockFilter);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('findDepartmentWiseTrend', () => {
+    const mockDepartmentResponse = {
+      status: 200,
+      message:
+        DashboardModuleConstants.SUCCESS_MESSAGES.SUCCESS_DASHBOARD_DEPARTMENT,
+      data: [
+        { department: 'Engineering', count: '15' },
+        { department: 'HR', count: '4' },
+      ],
+    };
+
+    it('should successfully pass query filters and call function', async () => {
+      const mockFilter: FilterOptionDto = {
+        department: 'HR',
+        country: 'CA',
+      };
+      service.departmentWiseTrend.mockResolvedValueOnce(mockDepartmentResponse);
+      const result = await controller.findDepartmentWiseTrend(mockFilter);
+      expect(service.departmentWiseTrend).toHaveBeenCalledWith(mockFilter);
+      expect(result).toEqual(mockDepartmentResponse);
+    });
+
+    it('should handle no filter condition', async () => {
+      const mockFilter: FilterOptionDto = {};
+      service.departmentWiseTrend.mockResolvedValueOnce(mockDepartmentResponse);
+      const result = await controller.findDepartmentWiseTrend(mockFilter);
+      expect(service.departmentWiseTrend).toHaveBeenCalledWith(mockFilter);
+      expect(result).toEqual(mockDepartmentResponse);
+    });
+  });
+
+  describe('findLatestYearSalaryTrend', () => {
+    const mockResponse = {
+      status: 200,
+      message:
+        DashboardModuleConstants.SUCCESS_MESSAGES
+          .SUCCESS_DASHBOARD_RECENT_SALARY,
+      data: [
+        { year: 2026, min: 2000, max: 40000, avg: 2000 },
+        { year: 2027, min: 2000, max: 40000, avg: 2000 },
+      ],
+    };
+
+    it('should successfully pass query filters and call function', async () => {
+      const mockFilter: FilterOptionDto = {
+        department: 'HR',
+        country: 'CA',
+      };
+      service.getSalaryTrendRecentYears.mockResolvedValueOnce(mockResponse);
+      const result = await controller.findLatestYearSalaryTrend(mockFilter);
+      expect(service.getSalaryTrendRecentYears).toHaveBeenCalledWith(
+        mockFilter,
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should handle no filter condition', async () => {
+      const mockFilter: FilterOptionDto = {};
+      service.getSalaryTrendRecentYears.mockResolvedValueOnce(mockResponse);
+      const result = await controller.findLatestYearSalaryTrend(mockFilter);
+      expect(service.getSalaryTrendRecentYears).toHaveBeenCalledWith(
+        mockFilter,
+      );
       expect(result).toEqual(mockResponse);
     });
   });

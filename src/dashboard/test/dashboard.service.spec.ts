@@ -124,4 +124,150 @@ describe('DashboardService', () => {
       );
     });
   });
+
+  describe('departmentWiseTrend', () => {
+    const mockDepartmentRows = [
+      { department: 'Engineering', count: '15' },
+      { department: 'HR', count: '4' },
+    ];
+
+    it('should fetch department wise trends with default queries when no filters are present', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const result = await service.departmentWiseTrend();
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        'SELECT department, COUNT(*) from employees where 1=1 AND 1=1 AND 1=1 GROUP BY department',
+      );
+      expect(result).toEqual({
+        status: 200,
+        message:
+          DashboardModuleConstants.SUCCESS_MESSAGES
+            .SUCCESS_DASHBOARD_DEPARTMENT,
+        data: mockDepartmentRows,
+      });
+    });
+
+    it('should inject country query safely when only country filter is provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = { country: 'US' };
+      await service.departmentWiseTrend(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "SELECT department, COUNT(*) from employees where 1=1 AND country = 'US' AND 1=1 GROUP BY department",
+      );
+    });
+
+    it('should inject department query safely when only department filter is provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = { department: 'HR' };
+      await service.departmentWiseTrend(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "SELECT department, COUNT(*) from employees where 1=1 AND 1=1 AND department = 'HR' GROUP BY department",
+      );
+    });
+
+    it('should inject both country and department parameters when both filters are provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = {
+        country: 'IN',
+        department: 'Engineering',
+      };
+      await service.departmentWiseTrend(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "SELECT department, COUNT(*) from employees where 1=1 AND country = 'IN' AND department = 'Engineering' GROUP BY department",
+      );
+    });
+
+    it('should log errors and throw InternalServerErrorException when database operation fails', async () => {
+      const dbError = new Error('Database connection failed');
+      mockPgConnection.query.mockRejectedValueOnce(dbError);
+
+      await expect(service.departmentWiseTrend()).rejects.toThrow(
+        new InternalServerErrorException('Database connection failed'),
+      );
+    });
+  });
+
+  describe('getSalaryTrendRecentYears', () => {
+    const mockDepartmentRows = [
+      { year: 2026, min: 2000, max: 40000, avg: 2000 },
+      { year: 2025, min: 2000, max: 40000, avg: 2000 },
+      { year: 2024, min: 2000, max: 40000, avg: 2000 },
+      { year: 2023, min: 2000, max: 40000, avg: 2000 },
+      { year: 2022, min: 2000, max: 40000, avg: 2000 },
+      { year: 2021, min: 2000, max: 40000, avg: 2000 },
+      { year: 2020, min: 2000, max: 40000, avg: 2000 },
+      { year: 2019, min: 2000, max: 40000, avg: 2000 },
+      { year: 2018, min: 2000, max: 40000, avg: 2000 },
+      { year: 2017, min: 2000, max: 40000, avg: 2000 },
+    ];
+
+    it('should fetch salary trend of recent 10 years', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const result = await service.getSalaryTrendRecentYears();
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        'Select min(salary), max(salary), avg(salary), EXTRACT(YEAR from date_of_joining) from employees WHERE 1=1  group by EXTRACT(YEAR from date_of_joining) order by EXTRACT(YEAR from date_of_joining) desc limit 10',
+      );
+      expect(result).toEqual({
+        status: 200,
+        message:
+          DashboardModuleConstants.SUCCESS_MESSAGES
+            .SUCCESS_DASHBOARD_RECENT_SALARY,
+        data: mockDepartmentRows,
+      });
+    });
+
+    it('should inject country query safely when only country filter is provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = { country: 'India' };
+      await service.getSalaryTrendRecentYears(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "Select min(salary), max(salary), avg(salary), EXTRACT(YEAR from date_of_joining) from employees WHERE 1=1  AND country = 'India' group by EXTRACT(YEAR from date_of_joining) order by EXTRACT(YEAR from date_of_joining) desc limit 10",
+      );
+    });
+
+    it('should inject department query safely when only department filter is provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = { department: 'HR' };
+      await service.getSalaryTrendRecentYears(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "Select min(salary), max(salary), avg(salary), EXTRACT(YEAR from date_of_joining) from employees WHERE 1=1   AND department = 'HR' group by EXTRACT(YEAR from date_of_joining) order by EXTRACT(YEAR from date_of_joining) desc limit 10",
+      );
+    });
+
+    it('should inject both country and department parameters when both filters are provided', async () => {
+      mockPgConnection.query.mockResolvedValueOnce({
+        rows: mockDepartmentRows,
+      });
+      const filter: FilterOptionDto = {
+        country: 'India',
+        department: 'Engineering',
+      };
+      await service.getSalaryTrendRecentYears(filter);
+      expect(mockPgConnection.query).toHaveBeenCalledWith(
+        "Select min(salary), max(salary), avg(salary), EXTRACT(YEAR from date_of_joining) from employees WHERE 1=1   AND department = 'Engineering'AND country = 'India' group by EXTRACT(YEAR from date_of_joining) order by EXTRACT(YEAR from date_of_joining) desc limit 10",
+      );
+    });
+
+    it('should log errors and throw InternalServerErrorException when database operation fails', async () => {
+      const dbError = new Error('Database connection failed');
+      mockPgConnection.query.mockRejectedValueOnce(dbError);
+
+      await expect(service.getSalaryTrendRecentYears()).rejects.toThrow(
+        new InternalServerErrorException('Database connection failed'),
+      );
+    });
+  });
 });

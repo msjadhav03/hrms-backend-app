@@ -1,42 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DashboardService } from '../dashboard.service';
 import { DashboardController } from '../dashboard.controller';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-describe('Dashboard Controller', () => {
-  let dashboardService: DashboardService;
-  let dashboardController: DashboardController;
-  let jwtService: any;
-  let configService: any;
-  const mockConfigValues: Record<string, any> = {
-    JWT_SECRET: 'fsdfnsfdn',
+import { DashboardService } from '../dashboard.service';
+import { FilterOptionDto } from '../dto/filter.dto';
+import { AuthGuard } from '../../auth/auth.guard';
+import { RolesGuard } from '../../auth/roles.guard';
+import { HttpStatus } from '@nestjs/common';
+import { DashboardModuleConstants } from '../../common/constants/messages';
+
+describe('DashboardController', () => {
+  let controller: DashboardController;
+  let service: jest.Mocked<DashboardService>;
+
+  const mockDashboardService = {
+    getSalaryTrend: jest.fn(),
   };
 
+  const mockAuthGuard = { canActivate: jest.fn(() => true) };
+  const mockRolesGuard = { canActivate: jest.fn(() => true) };
+
   beforeEach(async () => {
-    jwtService = {
-      signAsync: jest.fn().mockResolvedValue('sdfsdfsdf'),
-      logger: jest.fn(),
-    };
-    configService = {
-      get: jest.fn().mockResolvedValue(mockConfigValues),
-    };
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DashboardController],
       providers: [
-        DashboardService,
         {
-          provide: JwtService,
-          useValue: jwtService,
-        },
-        {
-          provide: ConfigService,
-          useValue: configService,
+          provide: DashboardService,
+          useValue: mockDashboardService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile();
 
-    dashboardService = module.get<DashboardService>(DashboardService);
-    dashboardController = module.get<DashboardController>(DashboardController);
+    controller = module.get<DashboardController>(DashboardController);
+    service = module.get(DashboardService);
   });
 
   afterEach(() => {
@@ -44,6 +43,44 @@ describe('Dashboard Controller', () => {
   });
 
   it('should be defined', () => {
-    expect(dashboardController).toBeDefined();
+    expect(controller).toBeDefined();
+  });
+
+  describe('findSalaryAvgMinMax', () => {
+    it('should successfully pass filters to the service and return salary trends', async () => {
+      const mockFilter: FilterOptionDto = {
+        department: 'Engineering',
+        country: 'US',
+      };
+
+      const mockResponse = {
+        status: HttpStatus.OK,
+        message:
+          DashboardModuleConstants.SUCCESS_MESSAGES
+            .SUCCESS_DASHBOARD_MIN_MAX_AVG,
+        data: [{ min: 40000, max: 120000, avg: 80000 }],
+      };
+
+      service.getSalaryTrend.mockResolvedValueOnce(mockResponse);
+      const result = await controller.findSalaryAvgMinMax(mockFilter);
+      expect(service.getSalaryTrend).toHaveBeenCalledWith(mockFilter);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should pass empty or undefined filters smoothly to the service layer', async () => {
+      const mockFilter: FilterOptionDto = {};
+      const mockResponse = {
+        status: HttpStatus.OK,
+        message:
+          DashboardModuleConstants.SUCCESS_MESSAGES
+            .SUCCESS_DASHBOARD_MIN_MAX_AVG,
+        data: [{ min: 30000, max: 90000, avg: 60000 }],
+      };
+
+      service.getSalaryTrend.mockResolvedValueOnce(mockResponse);
+      const result = await controller.findSalaryAvgMinMax(mockFilter);
+      expect(service.getSalaryTrend).toHaveBeenCalledWith(mockFilter);
+      expect(result).toEqual(mockResponse);
+    });
   });
 });

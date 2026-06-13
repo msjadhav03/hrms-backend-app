@@ -50,11 +50,11 @@ export const AnalyticModuleConstants = {
   TAG: 'Analytic Module: APIs to fetch Analytical Data',
   SUMMARY: {
     SUMMARY_ENTITY_COUNT:
-      '/analytics/count-of-entities : Responsible for fetching count of entities',
+      '/analytics/count-of-entities : Entity counts Total Employee et. cetera',
     SUMMARY_TOP_MOST_PAID_JOBS:
-      '/analytics/top-most-paid-jobs : Responsible for fetching top most paid jobs',
+      '/analytics/top-most-paid-jobs : Top most paid job',
     SUMMARY_TOP_MOST_PAID_DEPARTMENT:
-      '/analytics/top-most-paid-department : Responsible for fetching top most paid department',
+      '/analytics/top-most-paid-department : Top most padi department',
   },
   SUCCESS_MESSAGES: {
     SUCCESS_ENTITY_COUNT: 'Organizations Entity Count Fetched Successfully',
@@ -73,18 +73,19 @@ export const AnalyticModuleConstants = {
 export const EmployeeModuleConstants = {
   TAG: 'EmployeeModule: APIs to Create, Delete, Upadate and Get Employee Resource',
   SUMMARY: {
-    EMPLOYEE_CREATION: 'This API is responsible for Employee Resource creation',
-    EMPLOYEE_DELETED: 'This API is responsible for Employee Resource Deletion',
-    EMPLOYEE_FETCH: 'This API is responsible for Employee Resource Fetching',
-    EMPLOYEE_FETCH_BY_ID:
-      'This API is responsible for Employee Resource Fetching by ID',
-    EMPLOYEE_UPDATE: 'This API is responsible for Employee Resource Update',
+    EMPLOYEE_CREATION: 'Create new Employee',
+    EMPLOYEE_DELETED: 'Delete Employee',
+    EMPLOYEE_FETCH: 'Getting Employees list',
+    EMPLOYEE_FETCH_BY_ID: 'Fetch Employee Resource by ID',
+    EMPLOYEE_UPDATE: 'Employee Resource Updation',
+    FILTER_DATA: 'Filter Data : Country and Department',
   },
   SUCCESS_MESSAGES: {
     EMPLOYEE_CREATION_SUCCESS: 'Emplpyee has been onboarded successfully',
     EMPLOYEE_DELETE_SUCCESS: 'Employee has been deleted successfully',
     EMPLOYEE_FETCH_SUCCESS: 'Employee data has been successfully fetched',
     EMPLOYEE_UPDATE_SUCCESS: 'Employee Updated successfully',
+    FILTER_SUCCESS: 'Filter values fetched successfully',
   },
   ERROR_MESSAGES: {
     EMPLOYEE_CREATION_FAILED: 'Table creation failed',
@@ -94,13 +95,14 @@ export const EmployeeModuleConstants = {
     FAILED_PASSWORD_HASHING: 'Failed while generating hashed password',
     FAILED_GENERATING_RANDOM_PASSWORD:
       'Failed while generating random password',
+    FAILED_FILTER: 'Failed to fetch filter values',
   },
 };
 
 export const AuthModuleConstants = {
   TAG: 'Auth Module: Authorization and Authentication APIs',
   SUMMARY: {
-    LOGIN_SUMMARY: 'This API is responsible for login',
+    LOGIN_SUMMARY: 'Authorization and Authentication',
   },
   SUCCESS_MESSAGES: {
     LOGIN_SUCCESS: 'User has been logged Successfully',

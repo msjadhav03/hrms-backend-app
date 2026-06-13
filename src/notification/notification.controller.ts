@@ -10,10 +10,12 @@ import { NotificationModuleConstants } from '../common/constants/messages';
 import { NotificationService } from './notification.service';
 import { SendEmailDto } from './dto/send.email.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @ApiTags(NotificationModuleConstants.TAG)
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
@@ -29,6 +31,7 @@ export class NotificationController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: NotificationModuleConstants.ERROR_MESSAGES.EMAIL_FAILED,
   })
+  @Roles('hr-manger', 'hr-manager')
   @Post('send-notification')
   @ApiProperty()
   sendNotification(@Body() body: SendEmailDto) {

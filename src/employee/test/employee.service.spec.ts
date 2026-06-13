@@ -362,7 +362,6 @@ describe('EmployeeService', () => {
 
       expect(mockDbPool.query).toHaveBeenCalledTimes(1);
       const queryArgs = mockDbPool.query.mock.calls[0];
-      console.log(queryArgs);
       expect(queryArgs[1][0]).toBe(targetId);
     });
 

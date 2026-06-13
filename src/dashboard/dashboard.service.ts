@@ -44,8 +44,6 @@ export class DashboardService {
         let whereClause = this.buildQuery(filter);
         query = `${query} WHERE 1=1 ${whereClause}`;
       }
-
-      console.log(query);
       const response = await this.db.query(query);
       return {
         status: HttpStatus.OK,

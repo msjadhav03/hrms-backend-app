@@ -73,8 +73,6 @@ describe('Auth Controller', () => {
         mockLoginDto.password,
       );
       expect(result).toEqual(mockLoginSuccessResponse);
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(mockLoginDto);
       consoleLogSpy.mockRestore();
     });
 

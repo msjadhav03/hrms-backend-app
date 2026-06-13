@@ -25,7 +25,6 @@ export class AuthController {
   @PublicRoute()
   @Post('/login')
   async login(@Body() body: LoginDto) {
-    console.log(body);
     return this.authService.validateCredentials(body.username, body.password);
   }
 }

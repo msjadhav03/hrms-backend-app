@@ -50,7 +50,6 @@ export class AnalyticService {
   async findCountOfEntities(getAnalyticDto: GetAnalyticDto) {
     try {
       const { country } = getAnalyticDto;
-      console.log(country);
       let whereClause = '';
       let employeeCountQuery = `SELECT COUNT(*) from employees where 1=1`;
       let departmentCountQuery = `SELECT COUNT(DISTINCT department) from employees where 1=1`;
@@ -98,7 +97,6 @@ export class AnalyticService {
   async findTopMostPaidJobs(getAnalyticDto: GetAnalyticDto) {
     try {
       const { country } = getAnalyticDto;
-      console.log(country);
       let query = `SELECT job_title,salary from employees where 1=1`;
       query = this.buildQuery(getAnalyticDto, query);
       query = query + ` ORDER BY salary DESC LIMIT 10`;
@@ -125,7 +123,6 @@ export class AnalyticService {
   async findTopMostPaidDepartment(getAnalyticDto: GetAnalyticDto) {
     try {
       const { country } = getAnalyticDto;
-      console.log(country);
       let query = `SELECT department, SUM(salary) as total_salary from employees where 1=1`;
       query = this.buildQuery(getAnalyticDto, query);
       query =

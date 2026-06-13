@@ -9,6 +9,7 @@ import { EmployeeModule } from './employee/employee.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { AnalyticModule } from './analytics/analytic.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     SeeedingModule,
     DashboardModule,
     EmployeeModule,
+    AnalyticModule,
     NotificationModule,
   ],
   controllers: [],

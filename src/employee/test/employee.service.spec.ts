@@ -472,4 +472,58 @@ describe('EmployeeService', () => {
       );
     });
   });
+
+  describe('findFilterList', () => {
+    it('should successfully return distinct lists of countries and departments formatted cleanly', async () => {
+      const mockCountryRows = [{ country: 'Canada' }, { country: 'USA' }];
+      const mockDepartmentRows = [
+        { department: 'Engineering' },
+        { department: 'Sales' },
+      ];
+      mockDbPool.query
+        .mockResolvedValueOnce({ rows: mockCountryRows })
+        .mockResolvedValueOnce({ rows: mockDepartmentRows });
+
+      const result = await service.findFilterList();
+      expect(mockDbPool.query).toHaveBeenNthCalledWith(
+        1,
+        `SELECT DISTINCT country from employees ORDER BY country ASC`,
+      );
+      expect(mockDbPool.query).toHaveBeenNthCalledWith(
+        2,
+        `SELECT DISTINCT department from employees ORDER BY department ASC`,
+      );
+      expect(result).toEqual({
+        status: HttpStatus.OK,
+        message: EmployeeModuleConstants.SUCCESS_MESSAGES.FILTER_SUCCESS,
+        data: {
+          country: mockCountryRows,
+          department: mockDepartmentRows,
+        },
+      });
+    });
+
+    it('should return empty arrays safely if the database returns undefined rows collections', async () => {
+      mockDbPool.query
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(undefined);
+      const result = await service.findFilterList();
+      expect(result.data).toEqual({
+        country: [],
+        department: [],
+      });
+    });
+
+    it('should throw InternalServerErrorException when the database crashes', async () => {
+      const databaseError = new Error(
+        'Connection timeout to PostgreSQL instance',
+      );
+      mockDbPool.query.mockRejectedValueOnce(databaseError);
+      const callPromise = service.findFilterList();
+      await expect(callPromise).rejects.toThrow(InternalServerErrorException);
+      await expect(callPromise).rejects.toThrow(
+        'Connection timeout to PostgreSQL instance',
+      );
+    });
+  });
 });

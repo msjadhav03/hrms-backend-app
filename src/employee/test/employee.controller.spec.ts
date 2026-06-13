@@ -115,6 +115,29 @@ describe('EmployeeController', () => {
     message: EmployeeModuleConstants.SUCCESS_MESSAGES.EMPLOYEE_DELETE_SUCCESS,
   };
 
+  const mockResponseDataForFilter = {
+    status: HttpStatus.OK,
+    message: 'Filter values fetched successfully',
+    data: {
+      department: [
+        {
+          department: 'Administration',
+        },
+        {
+          department: 'Customer Support',
+        },
+      ],
+      country: [
+        {
+          department: 'India',
+        },
+        {
+          department: 'Japan',
+        },
+      ],
+    },
+  };
+
   beforeEach(async () => {
     jwtService = {
       signAsync: jest.fn().mockResolvedValue('sdfsdfsdf'),
@@ -129,6 +152,7 @@ describe('EmployeeController', () => {
       findEmployeeById: jest.fn(),
       deleteOne: jest.fn(),
       find: jest.fn(),
+      findFilterList: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -313,6 +337,30 @@ describe('EmployeeController', () => {
         InternalServerErrorException,
       );
       await expect(controller.getEmployees(mockGetEmployeeDto)).rejects.toThrow(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+    });
+  });
+
+  describe('findCountryTitles', () => {
+    it('should call and return the expected data', async () => {
+      jest
+        .spyOn(service, 'findFilterList')
+        .mockResolvedValue(mockResponseDataForFilter);
+      const result = await controller.findCountryTitles();
+      expect(service.findFilterList).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockResponseDataForFilter);
+    });
+
+    it('should throw InternalServerError in case of failure', async () => {
+      const serviceError = new InternalServerErrorException(
+        ErrorMessages.INTERNAL_SERVER_ERROR,
+      );
+      jest.spyOn(service, 'findFilterList').mockRejectedValue(serviceError);
+      await expect(controller.findCountryTitles()).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      await expect(controller.findCountryTitles()).rejects.toThrow(
         ErrorMessages.INTERNAL_SERVER_ERROR,
       );
     });

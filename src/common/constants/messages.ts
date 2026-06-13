@@ -99,11 +99,17 @@ export const EmployeeModuleConstants = {
 
 export const AuthModuleConstants = {
   TAG: 'Auth Module: Authorization and Authentication APIs',
+  SUMMARY: {
+    LOGIN_SUMMARY: 'This API is responsible for login',
+  },
   SUCCESS_MESSAGES: {
     LOGIN_SUCCESS: 'User has been logged Successfully',
   },
   ERROR_MESSAGES: {
     LOGIN_FAILED: 'User Login Failed',
+    INCORRECT_PASSWORD: 'Authentication failed: Incorrect Password',
+    USER_NOT_FOUND: 'User not found',
+    FORBIDDEN: 'Forbidden/Unauthorized',
   },
 };
 

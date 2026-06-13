@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-expection.filter';
 import { DatabasePostgresModule } from './database/database.module';
 import { SeeedingModule } from './seeding/seeding.module';

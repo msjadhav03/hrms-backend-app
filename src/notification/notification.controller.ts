@@ -1,5 +1,6 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiOperation,
   ApiProperty,
   ApiResponse,
@@ -8,8 +9,11 @@ import {
 import { NotificationModuleConstants } from '../common/constants/messages';
 import { NotificationService } from './notification.service';
 import { SendEmailDto } from './dto/send.email.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags(NotificationModuleConstants.TAG)
+@ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard)
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}

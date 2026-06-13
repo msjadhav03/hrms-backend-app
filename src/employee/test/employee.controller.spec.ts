@@ -9,22 +9,30 @@ import {
 import { CreateEmployeeDto } from '../dto/create.employee.dto';
 import { UpdateEmployeeDto } from '../dto/update.employee.dto';
 import { GetEmployeeDto } from '../dto/get.employee.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 describe('EmployeeController', () => {
   let controller: EmployeeController;
   let service: EmployeeService;
+  let jwtService: any;
+  let configService: any;
+
+  const mockConfigValues: Record<string, any> = {
+    JWT_SECRET: 'fsdfnsfdn',
+  };
 
   const mockCreateDto: CreateEmployeeDto = {
     fullname: 'Manisha Jadhav',
     official_mail: 'manishajadhav0026@gmail.com',
-    onboard_location: 'Pune',
+    onboard_location: 'XYZ',
     job_title: 'Software Engineer',
     salary: 2925000,
     date_of_joining: '01-07-2026',
     department: 'Engineering',
     country: 'India',
     address_line: 'Hinjawadi Infotech Park',
-    city: 'Pune',
+    city: 'XYZ',
     state: 'Maharashtra',
     zip_code: '411057',
     personal_email: 'manisha.personal@example.com',
@@ -60,14 +68,14 @@ describe('EmployeeController', () => {
       employee_code: 'EMP-8939000943',
       fullname: 'Manisha Jadhav',
       official_mail: 'manishajadhav0026@gmail.com',
-      onboard_location: 'Pune',
+      onboard_location: 'XYZ',
       job_title: 'Senior Software Engineer',
       salary: '150000.00',
       date_of_joining: '2000-02-01T18:30:00.000Z',
       department: 'Human Resources',
       country: 'India',
-      address_line: 'Kuber Park 1, Pune',
-      city: 'Pune',
+      address_line: 'SBI Park XYZ',
+      city: 'XYZ',
       state: 'Maharashtra',
       zip_code: '312421',
       personal_email: 'manishajadhav2323@gmail.com',
@@ -108,6 +116,13 @@ describe('EmployeeController', () => {
   };
 
   beforeEach(async () => {
+    jwtService = {
+      signAsync: jest.fn().mockResolvedValue('sdfsdfsdf'),
+      logger: jest.fn(),
+    };
+    configService = {
+      get: jest.fn().mockResolvedValue(mockConfigValues),
+    };
     const mockEmployeeService = {
       createNewEmployee: jest.fn(),
       updateEmployee: jest.fn(),
@@ -122,6 +137,14 @@ describe('EmployeeController', () => {
         {
           provide: EmployeeService,
           useValue: mockEmployeeService,
+        },
+        {
+          provide: JwtService,
+          useValue: jwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: configService,
         },
       ],
     }).compile();

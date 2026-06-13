@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
 import { DatabaseProviders } from '../database/database.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [DashboardController],
   providers: [...DatabaseProviders, DashboardService],
 })
